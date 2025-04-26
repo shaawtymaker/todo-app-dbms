@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 
@@ -38,8 +37,6 @@ interface TodoContextType {
   state: TodoState;
   dispatch: React.Dispatch<TodoAction>;
 }
-
-<lov-add-dependency>nanoid@4.0.2</lov-add-dependency>
 
 // Default lists
 const defaultLists: TodoList[] = [
