@@ -2,6 +2,8 @@
 import { useParams, Navigate } from "react-router-dom";
 import { useTodo } from "@/contexts/TodoContext";
 import { TodoListView } from "@/components/Todo/TodoList";
+import { TodoProgress } from "@/components/Todo/TodoProgress";
+import { Card } from "@/components/ui/card"; 
 import { useEffect } from "react";
 
 export default function TodoListPage() {
@@ -22,5 +24,17 @@ export default function TodoListPage() {
     return <Navigate to="/lists/inbox" replace />;
   }
   
-  return <TodoListView listId={list.id} title={list.name} color={list.color} />;
+  return (
+    <div className="space-y-6 animate-slide-in">
+      <Card className="p-6 mb-6 animate-scale-in">
+        <TodoProgress listId={list.id} />
+      </Card>
+      
+      <TodoListView 
+        listId={list.id} 
+        title={list.name} 
+        color={list.color} 
+      />
+    </div>
+  );
 }

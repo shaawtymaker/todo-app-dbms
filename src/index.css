@@ -5,65 +5,79 @@
 
 @layer base {
   :root {
+    /* Light Theme Variables */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 222 47% 11%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 210 40% 98%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 221.2 83.2% 53.3%;
+    --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 250 91% 63%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 160 84% 39%;
+    --accent-foreground: 210 40% 98%;
 
-    --accent: 250 95% 76%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --success: 142 71% 45%;
+    --success-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 210 40% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Dark Theme Variables */
+    --background: 222 47% 11%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 222 47% 16%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 217 91% 68%;
+    --primary-foreground: 222 47% 11%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 250 95% 76%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 250 95% 76%;
+    --accent: 160 84% 45%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --muted: 217 33% 18%;
+    --muted-foreground: 215 20% 65%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --destructive: 0 63% 63%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --success: 142 71% 45%;
+    --success-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 210 40% 98%;
+
+    --border: 217 33% 26%;
+    --input: 217 33% 26%;
+    --ring: 224 76% 48%;
   }
 }
 
@@ -71,12 +85,42 @@
   * {
     @apply border-border;
   }
+  
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  h1 {
+    @apply text-3xl font-bold leading-tight;
+  }
+  
+  h2 {
+    @apply text-2xl font-semibold leading-tight;
+  }
+  
+  h3 {
+    @apply text-xl font-semibold leading-tight;
+  }
+  
+  p {
+    @apply text-base leading-relaxed;
+  }
+  
+  small {
+    @apply text-sm leading-relaxed;
+  }
+  
+  .caption {
+    @apply text-xs leading-relaxed;
+  }
 }
 
+/* Animation keyframes */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -97,10 +141,94 @@
   }
 }
 
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+/* Utility animation classes */
 .animate-slide-in {
-  animation: slideIn 0.2s ease-out forwards;
+  animation: slideIn 0.25s ease-out forwards;
 }
 
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* Staggered animations for lists */
+.stagger-item {
+  opacity: 0;
+}
+
+.stagger-item:nth-child(1) { animation: fadeIn 0.3s ease-out 0.05s forwards; }
+.stagger-item:nth-child(2) { animation: fadeIn 0.3s ease-out 0.1s forwards; }
+.stagger-item:nth-child(3) { animation: fadeIn 0.3s ease-out 0.15s forwards; }
+.stagger-item:nth-child(4) { animation: fadeIn 0.3s ease-out 0.2s forwards; }
+.stagger-item:nth-child(5) { animation: fadeIn 0.3s ease-out 0.25s forwards; }
+.stagger-item:nth-child(n+6) { animation: fadeIn 0.3s ease-out 0.3s forwards; }
+
+/* Component specific animations */
+.todo-item-enter {
+  animation: slideIn 0.25s ease-out forwards;
+}
+
+.todo-item-exit {
+  animation: fadeIn 0.2s ease-out forwards reverse;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.checkmark-animation path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkmark 0.3s ease-in-out forwards;
+}
+
+/* Spacing utilities */
+.spacing-xs { margin: 0.5rem; }
+.spacing-sm { margin: 0.75rem; }
+.spacing-md { margin: 1rem; }
+.spacing-lg { margin: 1.5rem; }
+.spacing-xl { margin: 2rem; }
+.spacing-2xl { margin: 3rem; }
+
+/* Touch target adjustments for mobile */
+@media (max-width: 640px) {
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}
+

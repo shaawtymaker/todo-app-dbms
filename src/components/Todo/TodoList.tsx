@@ -3,9 +3,11 @@ import { Todo, useTodo } from "@/contexts/TodoContext";
 import { TodoItem } from "./TodoItem";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
+import { Plus, ListPlus } from "lucide-react";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface TodoListProps {
   listId: string;
@@ -50,53 +52,72 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
 
   return (
     <div className="space-y-6 animate-slide-in">
-      <div className="flex items-center gap-3">
-        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: color }} />
+      <div className="flex items-center gap-3 mb-lg">
+        <div 
+          className="w-5 h-5 rounded-full" 
+          style={{ backgroundColor: color }}
+        />
         <h1 className="text-2xl font-bold">{title}</h1>
       </div>
       
       {/* Add todo form */}
-      <form onSubmit={handleAddTodo} className="flex gap-2">
+      <form onSubmit={handleAddTodo} className="flex gap-2 mb-lg">
         <Input
           value={newTodoText}
           onChange={(e) => setNewTodoText(e.target.value)}
           placeholder="Add a new task"
-          className="flex-1"
+          className="flex-1 transition-all focus-visible:ring-primary"
         />
-        <Button type="submit" disabled={!newTodoText.trim()}>
+        <Button 
+          type="submit" 
+          disabled={!newTodoText.trim()}
+          className="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+        >
           <Plus size={18} className="mr-2" /> Add
         </Button>
       </form>
       
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="all">
-            All ({todos.length})
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full animate-fade-in">
+        <TabsList className="grid w-full grid-cols-3 mb-lg">
+          <TabsTrigger value="all" className="flex gap-2 items-center">
+            All <Badge variant="secondary">{todos.length}</Badge>
           </TabsTrigger>
-          <TabsTrigger value="active">
-            Active ({incompleteTodos.length})
+          <TabsTrigger value="active" className="flex gap-2 items-center">
+            Active <Badge variant="secondary">{incompleteTodos.length}</Badge>
           </TabsTrigger>
-          <TabsTrigger value="completed">
-            Completed ({completedTodos.length})
+          <TabsTrigger value="completed" className="flex gap-2 items-center">
+            Completed <Badge variant="secondary">{completedTodos.length}</Badge>
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="all" className="mt-4">
+        <TabsContent value="all" className="mt-4 animate-scale-in">
           {todos.length === 0 ? (
-            <p className="text-center text-muted-foreground py-6">No tasks yet. Create one above!</p>
+            <div className="text-center text-muted-foreground py-10 border-2 border-dashed rounded-lg flex flex-col items-center gap-4">
+              <ListPlus size={48} className="text-muted-foreground/50" />
+              <div>
+                <p className="font-medium">No tasks yet</p>
+                <p className="text-sm">Create one above to get started!</p>
+              </div>
+            </div>
           ) : (
             <div className="space-y-2">
-              {filteredTodos.map(todo => (
+              {filteredTodos.map((todo, index) => (
                 <TodoItem key={todo.id} todo={todo} />
               ))}
             </div>
           )}
         </TabsContent>
         
-        <TabsContent value="active" className="mt-4">
+        <TabsContent value="active" className="mt-4 animate-scale-in">
           {incompleteTodos.length === 0 ? (
-            <p className="text-center text-muted-foreground py-6">No active tasks. Great job!</p>
+            <div className="text-center text-muted-foreground py-10 border-2 border-dashed rounded-lg flex flex-col items-center gap-4">
+              <Check size={48} className="text-success/50" />
+              <div>
+                <p className="font-medium">No active tasks</p>
+                <p className="text-sm">Great job! All tasks are complete.</p>
+              </div>
+            </div>
           ) : (
             <div className="space-y-2">
               {filteredTodos.map(todo => (
@@ -106,9 +127,15 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
           )}
         </TabsContent>
         
-        <TabsContent value="completed" className="mt-4">
+        <TabsContent value="completed" className="mt-4 animate-scale-in">
           {completedTodos.length === 0 ? (
-            <p className="text-center text-muted-foreground py-6">No completed tasks yet.</p>
+            <div className="text-center text-muted-foreground py-10 border-2 border-dashed rounded-lg flex flex-col items-center gap-4">
+              <ListPlus size={48} className="text-muted-foreground/50" />
+              <div>
+                <p className="font-medium">No completed tasks yet</p>
+                <p className="text-sm">Complete some tasks to see them here.</p>
+              </div>
+            </div>
           ) : (
             <div className="space-y-2">
               {filteredTodos.map(todo => (
@@ -118,6 +145,18 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
           )}
         </TabsContent>
       </Tabs>
+      
+      {completedTodos.length > 0 && activeTab !== "completed" && (
+        <div className="flex justify-center mt-4">
+          <Button 
+            variant="outline" 
+            onClick={() => setActiveTab("completed")}
+            className="text-sm transition-all duration-200"
+          >
+            View {completedTodos.length} completed {completedTodos.length === 1 ? 'task' : 'tasks'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
