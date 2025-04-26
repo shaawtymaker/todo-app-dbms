@@ -1,5 +1,10 @@
+
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { nanoid } from 'nanoid';
+import { todoService } from '../services/todoService';
+import { listService } from '../services/listService';
+import { useAuth } from './AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 // Define types
 export interface Todo {
@@ -20,22 +25,32 @@ interface TodoState {
   todos: Todo[];
   lists: TodoList[];
   activeListId: string | null;
+  isLoading: boolean;
 }
 
 type TodoAction =
-  | { type: 'ADD_TODO'; payload: { text: string; listId: string } }
+  | { type: 'ADD_TODO'; payload: Todo }
+  | { type: 'SET_TODOS'; payload: Todo[] }
   | { type: 'TOGGLE_TODO'; payload: string }
-  | { type: 'EDIT_TODO'; payload: { id: string; text: string } }
+  | { type: 'UPDATE_TODO'; payload: Todo }
   | { type: 'DELETE_TODO'; payload: string }
-  | { type: 'ADD_LIST'; payload: { name: string; color: string } }
-  | { type: 'EDIT_LIST'; payload: { id: string; name: string; color: string } }
+  | { type: 'ADD_LIST'; payload: TodoList }
+  | { type: 'SET_LISTS'; payload: TodoList[] }
+  | { type: 'UPDATE_LIST'; payload: TodoList }
   | { type: 'DELETE_LIST'; payload: string }
   | { type: 'SET_ACTIVE_LIST'; payload: string | null }
-  | { type: 'LOAD_STATE'; payload: TodoState };
+  | { type: 'SET_LOADING'; payload: boolean };
 
 interface TodoContextType {
   state: TodoState;
   dispatch: React.Dispatch<TodoAction>;
+  addTodo: (text: string, listId: string) => Promise<void>;
+  toggleTodo: (id: string) => Promise<void>;
+  editTodo: (id: string, text: string) => Promise<void>;
+  deleteTodo: (id: string) => Promise<void>;
+  addList: (name: string, color: string) => Promise<void>;
+  editList: (id: string, name: string, color: string) => Promise<void>;
+  deleteList: (id: string) => Promise<void>;
 }
 
 // Default lists
@@ -49,7 +64,8 @@ const defaultLists: TodoList[] = [
 const initialState: TodoState = {
   todos: [],
   lists: defaultLists,
-  activeListId: 'inbox'
+  activeListId: 'inbox',
+  isLoading: false,
 };
 
 // Create context
@@ -58,19 +74,22 @@ const TodoContext = createContext<TodoContextType | undefined>(undefined);
 // Reducer function
 function todoReducer(state: TodoState, action: TodoAction): TodoState {
   switch (action.type) {
+    case 'SET_LOADING':
+      return {
+        ...state,
+        isLoading: action.payload
+      };
+      
+    case 'SET_TODOS':
+      return {
+        ...state,
+        todos: action.payload
+      };
+      
     case 'ADD_TODO':
       return {
         ...state,
-        todos: [
-          ...state.todos,
-          {
-            id: nanoid(),
-            text: action.payload.text,
-            completed: false,
-            listId: action.payload.listId || state.activeListId || 'inbox',
-            createdAt: Date.now()
-          }
-        ]
+        todos: [action.payload, ...state.todos]
       };
       
     case 'TOGGLE_TODO':
@@ -81,11 +100,11 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
         )
       };
       
-    case 'EDIT_TODO':
+    case 'UPDATE_TODO':
       return {
         ...state,
         todos: state.todos.map(todo =>
-          todo.id === action.payload.id ? { ...todo, text: action.payload.text } : todo
+          todo.id === action.payload.id ? action.payload : todo
         )
       };
       
@@ -95,26 +114,23 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
         todos: state.todos.filter(todo => todo.id !== action.payload)
       };
       
+    case 'SET_LISTS':
+      return {
+        ...state,
+        lists: action.payload
+      };
+      
     case 'ADD_LIST':
       return {
         ...state,
-        lists: [
-          ...state.lists,
-          {
-            id: nanoid(),
-            name: action.payload.name,
-            color: action.payload.color
-          }
-        ]
+        lists: [...state.lists, action.payload]
       };
       
-    case 'EDIT_LIST':
+    case 'UPDATE_LIST':
       return {
         ...state,
         lists: state.lists.map(list =>
-          list.id === action.payload.id
-            ? { ...list, name: action.payload.name, color: action.payload.color }
-            : list
+          list.id === action.payload.id ? action.payload : list
         )
       };
       
@@ -125,10 +141,6 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
       return {
         ...state,
         lists: state.lists.filter(list => list.id !== action.payload),
-        // Move todos from deleted list to inbox
-        todos: state.todos.map(todo =>
-          todo.listId === action.payload ? { ...todo, listId: 'inbox' } : todo
-        ),
         // If active list is deleted, switch to inbox
         activeListId: state.activeListId === action.payload ? 'inbox' : state.activeListId
       };
@@ -140,9 +152,6 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
         activeListId: action.payload
       };
       
-    case 'LOAD_STATE':
-      return action.payload;
-      
     default:
       return state;
   }
@@ -150,19 +159,257 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
 
 // Provider component
 export function TodoProvider({ children }: { children: React.ReactNode }) {
-  // Load state from localStorage or use default
-  const [state, dispatch] = useReducer(todoReducer, initialState, () => {
-    const savedState = localStorage.getItem('todoState');
-    return savedState ? JSON.parse(savedState) : initialState;
-  });
+  const [state, dispatch] = useReducer(todoReducer, initialState);
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
   
-  // Save state to localStorage whenever it changes
+  // Load data from API when authenticated
   useEffect(() => {
-    localStorage.setItem('todoState', JSON.stringify(state));
-  }, [state]);
+    if (!isAuthenticated) return;
+    
+    const loadData = async () => {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      try {
+        // Load lists
+        const lists = await listService.getAllLists();
+        dispatch({ type: 'SET_LISTS', payload: lists });
+        
+        // Load todos
+        const todos = await todoService.getAllTodos();
+        dispatch({ type: 'SET_TODOS', payload: todos });
+      } catch (error) {
+        console.error('Failed to load data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load your data. Please refresh and try again.',
+          variant: 'destructive',
+        });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
+    };
+    
+    loadData();
+  }, [isAuthenticated, toast]);
+  
+  // Add todo
+  const addTodo = async (text: string, listId: string) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      
+      // Optimistic update with temporary ID
+      const tempId = nanoid();
+      const tempTodo = {
+        id: tempId,
+        text,
+        completed: false,
+        listId: listId || state.activeListId || 'inbox',
+        createdAt: Date.now()
+      };
+      
+      dispatch({ type: 'ADD_TODO', payload: tempTodo });
+      
+      // API call
+      const savedTodo = await todoService.createTodo({
+        text,
+        listId: listId || state.activeListId || 'inbox'
+      });
+      
+      // Replace temp todo with the one from API
+      dispatch({ type: 'DELETE_TODO', payload: tempId });
+      dispatch({ type: 'ADD_TODO', payload: savedTodo });
+      
+    } catch (error) {
+      console.error('Failed to add todo:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to add task. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+  
+  // Toggle todo
+  const toggleTodo = async (id: string) => {
+    try {
+      // Optimistic update
+      dispatch({ type: 'TOGGLE_TODO', payload: id });
+      
+      // API call
+      const updatedTodo = await todoService.toggleTodo(id);
+      dispatch({ type: 'UPDATE_TODO', payload: updatedTodo });
+    } catch (error) {
+      console.error('Failed to toggle todo:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update task. Please try again.',
+        variant: 'destructive',
+      });
+      // Revert on failure
+      dispatch({ type: 'TOGGLE_TODO', payload: id });
+    }
+  };
+  
+  // Edit todo
+  const editTodo = async (id: string, text: string) => {
+    const todo = state.todos.find(t => t.id === id);
+    if (!todo) return;
+    
+    const originalText = todo.text;
+    
+    try {
+      // Optimistic update
+      dispatch({ 
+        type: 'UPDATE_TODO', 
+        payload: { ...todo, text } 
+      });
+      
+      // API call
+      const updatedTodo = await todoService.updateTodo(id, { text });
+      dispatch({ type: 'UPDATE_TODO', payload: updatedTodo });
+    } catch (error) {
+      console.error('Failed to edit todo:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update task. Please try again.',
+        variant: 'destructive',
+      });
+      // Revert on failure
+      dispatch({ 
+        type: 'UPDATE_TODO', 
+        payload: { ...todo, text: originalText } 
+      });
+    }
+  };
+  
+  // Delete todo
+  const deleteTodo = async (id: string) => {
+    const todo = state.todos.find(t => t.id === id);
+    if (!todo) return;
+    
+    try {
+      // Optimistic update
+      dispatch({ type: 'DELETE_TODO', payload: id });
+      
+      // API call
+      await todoService.deleteTodo(id);
+    } catch (error) {
+      console.error('Failed to delete todo:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete task. Please try again.',
+        variant: 'destructive',
+      });
+      // Revert on failure
+      if (todo) {
+        dispatch({ type: 'ADD_TODO', payload: todo });
+      }
+    }
+  };
+  
+  // Add list
+  const addList = async (name: string, color: string) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      
+      // API call
+      const newList = await listService.createList({ name, color });
+      
+      // Update state with response from API
+      dispatch({ type: 'ADD_LIST', payload: newList });
+      toast({
+        title: 'Success',
+        description: 'New list created successfully.',
+      });
+    } catch (error) {
+      console.error('Failed to add list:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create list. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+  
+  // Edit list
+  const editList = async (id: string, name: string, color: string) => {
+    // Don't allow editing inbox
+    if (id === 'inbox') return;
+    
+    const list = state.lists.find(l => l.id === id);
+    if (!list) return;
+    
+    try {
+      // Optimistic update
+      dispatch({ 
+        type: 'UPDATE_LIST', 
+        payload: { ...list, name, color } 
+      });
+      
+      // API call
+      const updatedList = await listService.updateList(id, { name, color });
+      dispatch({ type: 'UPDATE_LIST', payload: updatedList });
+    } catch (error) {
+      console.error('Failed to edit list:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update list. Please try again.',
+        variant: 'destructive',
+      });
+      // Revert on failure
+      dispatch({ type: 'UPDATE_LIST', payload: list });
+    }
+  };
+  
+  // Delete list
+  const deleteList = async (id: string) => {
+    // Don't allow deleting inbox
+    if (id === 'inbox') return;
+    
+    const list = state.lists.find(l => l.id === id);
+    if (!list) return;
+    
+    try {
+      // Optimistic update
+      dispatch({ type: 'DELETE_LIST', payload: id });
+      
+      // API call
+      await listService.deleteList(id);
+      
+      toast({
+        title: 'Success',
+        description: 'List deleted successfully.',
+      });
+    } catch (error) {
+      console.error('Failed to delete list:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete list. Please try again.',
+        variant: 'destructive',
+      });
+      // Revert on failure
+      if (list) {
+        dispatch({ type: 'ADD_LIST', payload: list });
+      }
+    }
+  };
   
   return (
-    <TodoContext.Provider value={{ state, dispatch }}>
+    <TodoContext.Provider value={{ 
+      state, 
+      dispatch,
+      addTodo,
+      toggleTodo,
+      editTodo,
+      deleteTodo,
+      addList,
+      editList,
+      deleteList
+    }}>
       {children}
     </TodoContext.Provider>
   );
