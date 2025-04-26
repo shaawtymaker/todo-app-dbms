@@ -22,9 +22,11 @@ export default function Index() {
     <div className="space-y-6 animate-slide-in">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <Button as={Link} to={`/lists/${state.activeListId || 'inbox'}`}>
-          <Plus size={18} className="mr-2" /> New Task
-        </Button>
+        <Link to={`/lists/${state.activeListId || 'inbox'}`}>
+          <Button>
+            <Plus size={18} className="mr-2" /> New Task
+          </Button>
+        </Link>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -84,14 +86,11 @@ export default function Index() {
                   </Link>
                 );
               })}
-              <Button 
-                variant="outline" 
-                className="w-full mt-2" 
-                as={Link} 
-                to="/settings"
-              >
-                <ListPlus size={16} className="mr-2" /> Manage Lists
-              </Button>
+              <Link to="/settings">
+                <Button variant="outline" className="w-full mt-2">
+                  <ListPlus size={16} className="mr-2" /> Manage Lists
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

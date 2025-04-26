@@ -55,7 +55,7 @@ export default function AppLayout() {
         <div className="container max-w-4xl py-8 px-4 md:px-8">
           {/* Theme switcher */}
           <div className="flex justify-end mb-6">
-            <ToggleGroup type="single" value={theme} onValueChange={(value) => value && setTheme(value as Theme)}>
+            <ToggleGroup type="single" value={theme} onValueChange={(value) => value && setTheme(value as 'light' | 'dark' | 'system')}>
               <ToggleGroupItem value="light" aria-label="Light mode" className="px-3">
                 <Sun size={18} className={theme === 'light' ? 'text-primary' : ''} />
               </ToggleGroupItem>

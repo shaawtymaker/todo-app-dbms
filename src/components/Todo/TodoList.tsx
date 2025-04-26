@@ -3,7 +3,7 @@ import { Todo, useTodo } from "@/contexts/TodoContext";
 import { TodoItem } from "./TodoItem";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, ListPlus } from "lucide-react";
+import { Plus, ListPlus, Check } from "lucide-react";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
