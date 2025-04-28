@@ -23,6 +23,7 @@ class User {
         )";
         
         $this->conn->exec($sql);
+        echo "table lowda, its created man🖐🏻";
     }
     
     public function findById($id) {
@@ -62,3 +63,4 @@ class User {
         return false;
     }
 }
+$user = new user();

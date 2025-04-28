@@ -13,18 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // Parse request URL
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = str_replace('/api/', '', $uri);
-$uri_parts = explode('/', $uri);
 
-// Route request to appropriate handler
+// Remove everything before /api/
+$apiPos = strpos($uri, '/api/');
+if ($apiPos !== false) {
+    $uri = substr($uri, $apiPos + strlen('/api/'));
+}
+
+$uri_parts = explode('/', trim($uri, '/'));
+
 $controller = isset($uri_parts[0]) ? $uri_parts[0] : '';
 $action = isset($uri_parts[1]) ? $uri_parts[1] : '';
 $id = isset($uri_parts[2]) ? $uri_parts[2] : null;
-
 // Include the appropriate controller based on the request
 switch ($controller) {
     case 'auth':
-        require __DIR__ . '/controllers/auth_controller.php';
+        require __DIR__ . '/../controllers/auth_controller.php';
         $auth_controller = new AuthController();
         
         switch ($action) {
@@ -48,7 +52,7 @@ switch ($controller) {
         break;
         
     case 'todos':
-        require __DIR__ . '/controllers/todo_controller.php';
+        require __DIR__ . '/../controllers/todo_controller.php';
         $todo_controller = new TodoController();
         
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && !$id) {
@@ -70,7 +74,7 @@ switch ($controller) {
         break;
         
     case 'lists':
-        require __DIR__ . '/controllers/list_controller.php';
+        require __DIR__ . '/../controllers/list_controller.php';
         $list_controller = new ListController();
         
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && !$id) {

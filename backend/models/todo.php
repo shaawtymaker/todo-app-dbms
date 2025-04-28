@@ -25,6 +25,7 @@ class Todo {
         )";
         
         $this->conn->exec($sql);
+        echo "nakkan table anthe, it's created. fuck PHP🦄.";
     }
     
     public function findById($id) {
@@ -102,3 +103,4 @@ class Todo {
         return $stmt->execute();
     }
 }
+$Todo = new Todo();
