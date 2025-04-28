@@ -28,15 +28,28 @@ interface TodoState {
   isLoading: boolean;
 }
 
+type TodoActionPayload = 
+  | Todo 
+  | Todo[] 
+  | TodoList 
+  | TodoList[] 
+  | string 
+  | boolean 
+  | { id: string; text: string } 
+  | { text: string; listId: string }
+  | { id: string; name: string; color: string };
+
 type TodoAction =
-  | { type: 'ADD_TODO'; payload: Todo }
+  | { type: 'ADD_TODO'; payload: Todo | { text: string; listId: string } }
   | { type: 'SET_TODOS'; payload: Todo[] }
   | { type: 'TOGGLE_TODO'; payload: string }
   | { type: 'UPDATE_TODO'; payload: Todo }
   | { type: 'DELETE_TODO'; payload: string }
-  | { type: 'ADD_LIST'; payload: TodoList }
+  | { type: 'EDIT_TODO'; payload: { id: string; text: string } }
+  | { type: 'ADD_LIST'; payload: TodoList | { name: string; color: string } }
   | { type: 'SET_LISTS'; payload: TodoList[] }
   | { type: 'UPDATE_LIST'; payload: TodoList }
+  | { type: 'EDIT_LIST'; payload: { id: string; name: string; color: string } }
   | { type: 'DELETE_LIST'; payload: string }
   | { type: 'SET_ACTIVE_LIST'; payload: string | null }
   | { type: 'SET_LOADING'; payload: boolean };
@@ -77,20 +90,38 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
     case 'SET_LOADING':
       return {
         ...state,
-        isLoading: action.payload
+        isLoading: action.payload as boolean
       };
       
     case 'SET_TODOS':
       return {
         ...state,
-        todos: action.payload
+        todos: action.payload as Todo[]
       };
       
-    case 'ADD_TODO':
-      return {
-        ...state,
-        todos: [action.payload, ...state.todos]
-      };
+    case 'ADD_TODO': {
+      const payload = action.payload;
+      if ('id' in payload) {
+        // If payload is already a Todo object
+        return {
+          ...state,
+          todos: [payload as Todo, ...state.todos]
+        };
+      } else {
+        // If payload is { text, listId }
+        const newTodo: Todo = {
+          id: nanoid(),
+          text: (payload as { text: string; listId: string }).text,
+          completed: false,
+          listId: (payload as { text: string; listId: string }).listId,
+          createdAt: Date.now()
+        };
+        return {
+          ...state,
+          todos: [newTodo, ...state.todos]
+        };
+      }
+    }
       
     case 'TOGGLE_TODO':
       return {
@@ -99,12 +130,22 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
           todo.id === action.payload ? { ...todo, completed: !todo.completed } : todo
         )
       };
+
+    case 'EDIT_TODO': {
+      const { id, text } = action.payload as { id: string; text: string };
+      return {
+        ...state,
+        todos: state.todos.map(todo =>
+          todo.id === id ? { ...todo, text } : todo
+        )
+      };
+    }
       
     case 'UPDATE_TODO':
       return {
         ...state,
         todos: state.todos.map(todo =>
-          todo.id === action.payload.id ? action.payload : todo
+          todo.id === (action.payload as Todo).id ? action.payload as Todo : todo
         )
       };
       
@@ -117,22 +158,48 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
     case 'SET_LISTS':
       return {
         ...state,
-        lists: action.payload
+        lists: action.payload as TodoList[]
       };
       
-    case 'ADD_LIST':
-      return {
-        ...state,
-        lists: [...state.lists, action.payload]
-      };
+    case 'ADD_LIST': {
+      const payload = action.payload;
+      if ('id' in payload) {
+        // If payload is already a TodoList
+        return {
+          ...state,
+          lists: [...state.lists, payload as TodoList]
+        };
+      } else {
+        // If payload is { name, color }
+        const newList: TodoList = {
+          id: nanoid(),
+          name: (payload as { name: string; color: string }).name,
+          color: (payload as { name: string; color: string }).color,
+        };
+        return {
+          ...state,
+          lists: [...state.lists, newList]
+        };
+      }
+    }
       
     case 'UPDATE_LIST':
       return {
         ...state,
         lists: state.lists.map(list =>
-          list.id === action.payload.id ? action.payload : list
+          list.id === (action.payload as TodoList).id ? action.payload as TodoList : list
         )
       };
+      
+    case 'EDIT_LIST': {
+      const { id, name, color } = action.payload as { id: string; name: string; color: string };
+      return {
+        ...state,
+        lists: state.lists.map(list =>
+          list.id === id ? { ...list, name, color } : list
+        )
+      };
+    }
       
     case 'DELETE_LIST': {
       // Don't allow deleting the inbox
@@ -149,7 +216,7 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
     case 'SET_ACTIVE_LIST':
       return {
         ...state,
-        activeListId: action.payload
+        activeListId: action.payload as string | null
       };
       
     default:
