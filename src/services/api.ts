@@ -64,6 +64,8 @@ export const apiClient = {
   
   // DELETE request
   delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+    return this.request<T>(endpoint, {
+      method: 'DELETE',
+    });
   },
 };
