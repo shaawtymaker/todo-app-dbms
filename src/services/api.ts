@@ -15,8 +15,17 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
   return response.json() as Promise<T>;
 };
 
+// Define type for the API client with generic methods
+interface ApiClient {
+  request<T>(endpoint: string, options?: RequestInit): Promise<T>;
+  get<T>(endpoint: string): Promise<T>;
+  post<T>(endpoint: string, data: any): Promise<T>;
+  put<T>(endpoint: string, data: any): Promise<T>;
+  delete<T>(endpoint: string): Promise<T>;
+}
+
 // API client for making requests to our PHP backend
-export const apiClient = {
+export const apiClient: ApiClient = {
   // Generic request method
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = getToken();
