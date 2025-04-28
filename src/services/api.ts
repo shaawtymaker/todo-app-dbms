@@ -12,7 +12,7 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
     throw new Error(errorData.message || `API Error: ${response.status}`);
   }
   
-  return response.json();
+  return response.json() as Promise<T>;
 };
 
 // API client for making requests to our PHP backend
