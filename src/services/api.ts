@@ -5,7 +5,7 @@ import { API_BASE_URL } from "../config/api";
 const getToken = () => localStorage.getItem('auth_token');
 
 // Handle API responses
-const handleResponse = async (response: Response) => {
+const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
     // Get error message from the response body
     const errorData = await response.json().catch(() => ({}));
@@ -38,7 +38,7 @@ export const apiClient = {
       },
     });
     
-    return handleResponse(response);
+    return handleResponse<T>(response);
   },
   
   // GET request
