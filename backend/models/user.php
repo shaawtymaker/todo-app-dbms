@@ -23,7 +23,7 @@ class User {
         )";
         
         $this->conn->exec($sql);
-        echo "table lowda, its created man🖐🏻";
+        // Removed debug echo statement that was breaking JSON responses
     }
     
     public function findById($id) {
@@ -63,4 +63,3 @@ class User {
         return false;
     }
 }
-$user = new user();

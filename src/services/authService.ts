@@ -46,11 +46,19 @@ export const authService = {
   async logout(): Promise<void> {
     // Call logout endpoint to invalidate token on server
     try {
-      await apiClient.post(API_ENDPOINTS.auth.logout, {});
+      await apiClient.post<{ message: string }>(API_ENDPOINTS.auth.logout, {});
     } finally {
       // Remove token from localStorage regardless of server response
       localStorage.removeItem('auth_token');
     }
+  },
+  
+  // Refresh token
+  async refreshToken(): Promise<AuthResponse> {
+    const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.refresh, {});
+    // Update token in localStorage
+    localStorage.setItem('auth_token', response.token);
+    return response;
   },
   
   // Check if user is authenticated

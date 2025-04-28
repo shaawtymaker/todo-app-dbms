@@ -1,3 +1,4 @@
+
 import { API_BASE_URL } from "../config/api";
 
 // Get token from localStorage
@@ -12,7 +13,7 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
   return response.json() as Promise<T>;
 };
 
-// The main request function (outside object to avoid `this`)
+// The main request function with proper typing
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
   
@@ -44,29 +45,29 @@ export interface ApiClient {
   delete<T>(endpoint: string): Promise<T>;
 }
 
-// API client
+// API client with proper typed functions
 export const apiClient: ApiClient = {
   request,
 
-  async get<T>(endpoint: string): Promise<T> {
+  get<T>(endpoint: string): Promise<T> {
     return request<T>(endpoint, { method: 'GET' });
   },
 
-  async post<T>(endpoint: string, data: any): Promise<T> {
+  post<T>(endpoint: string, data: any): Promise<T> {
     return request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  async put<T>(endpoint: string, data: any): Promise<T> {
+  put<T>(endpoint: string, data: any): Promise<T> {
     return request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   },
 
-  async delete<T>(endpoint: string): Promise<T> {
+  delete<T>(endpoint: string): Promise<T> {
     return request<T>(endpoint, {
       method: 'DELETE',
     });
