@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/../config/database.php';
 
@@ -24,7 +23,6 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
         )";
         
         $this->conn->exec($sql);
-        echo "Gandchot, table is created.💦 ";
     }
     
     public function findById($id) {

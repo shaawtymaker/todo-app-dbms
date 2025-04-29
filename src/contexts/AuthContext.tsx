@@ -1,14 +1,13 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { authService, User } from '../services/authService';
+import { authService, User, AuthResponse } from '../services/authService';
 import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
-  isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthResponse | undefined>;
+  register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<AuthResponse | undefined>;
   logout: () => Promise<void>;
 }
 
@@ -43,28 +42,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        // Clear invalid token
-        localStorage.removeItem('auth_token');
       } finally {
         setIsLoading(false);
       }
     };
     
     checkAuth();
-  }, []);
+  }, [toast]);
   
-  const login = async (email: string, password: string) => {
+  // Login handler
+  const login = async (email: string, password: string): Promise<AuthResponse | undefined> => {
     setIsLoading(true);
     try {
       const response = await authService.login({ email, password });
       setUser(response.user);
       return response;
+    } catch (error) {
+      console.error('Login failed:', error);
+      return undefined;
     } finally {
       setIsLoading(false);
     }
   };
   
-  const register = async (name: string, email: string, password: string, passwordConfirmation: string) => {
+  // Register handler
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    passwordConfirmation: string
+  ): Promise<AuthResponse | undefined> => {
     setIsLoading(true);
     try {
       const response = await authService.register({
@@ -75,11 +82,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       setUser(response.user);
       return response;
+    } catch (error) {
+      console.error('Registration failed:', error);
+      return undefined;
     } finally {
       setIsLoading(false);
     }
   };
   
+  // Logout handler
   const logout = async () => {
     setIsLoading(true);
     try {
@@ -91,23 +102,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
   
   return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated: !!user,
-      isLoading,
-      login,
-      register,
-      logout,
-    }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};

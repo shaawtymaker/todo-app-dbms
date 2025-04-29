@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/../config/database.php';
 
@@ -25,7 +24,7 @@ class Todo {
         )";
         
         $this->conn->exec($sql);
-        echo "nakkan table anthe, it's created. fuck PHP🦄.";
+        // Removed debug echo statement that was breaking JSON responses
     }
     
     public function findById($id) {
@@ -59,8 +58,8 @@ class Todo {
     public function create($data) {
         $id = uniqid();
         
-        $sql = "INSERT INTO todos (id, text, completed, list_id, user_id, created_at) 
-                VALUES (:id, :text, :completed, :list_id, :user_id, :created_at)";
+        $sql = "INSERT INTO todos (id, text, completed, list_id, user_id) 
+                VALUES (:id, :text, :completed, :list_id, :user_id)";
                 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
@@ -68,7 +67,6 @@ class Todo {
         $stmt->bindParam(':completed', $data['completed'], PDO::PARAM_BOOL);
         $stmt->bindParam(':list_id', $data['list_id']);
         $stmt->bindParam(':user_id', $data['user_id']);
-        $stmt->bindParam(':created_at', $data['created_at']);
         
         if ($stmt->execute()) {
             return $id;
@@ -103,4 +101,3 @@ class Todo {
         return $stmt->execute();
     }
 }
-$Todo = new Todo();
