@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  isAuthenticated: boolean;  // Added the missing property
   login: (email: string, password: string) => Promise<AuthResponse | undefined>;
   register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<AuthResponse | undefined>;
   logout: () => Promise<void>;
@@ -102,7 +103,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
   
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      isAuthenticated: !!user,  // Calculating isAuthenticated based on user presence
+      login, 
+      register, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );
