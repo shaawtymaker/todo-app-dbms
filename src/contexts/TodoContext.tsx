@@ -25,6 +25,7 @@ interface TodoState {
   lists: TodoList[];
   activeListId: string | null;
   isLoading: boolean;
+  loadError: string | null;
 }
 
 type TodoActionPayload = 
@@ -51,7 +52,8 @@ type TodoAction =
   | { type: 'EDIT_LIST'; payload: { id: string; name: string; color: string } }
   | { type: 'DELETE_LIST'; payload: string }
   | { type: 'SET_ACTIVE_LIST'; payload: string | null }
-  | { type: 'SET_LOADING'; payload: boolean };
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string };
 
 interface TodoContextType {
   state: TodoState;
@@ -78,6 +80,7 @@ const initialState: TodoState = {
   lists: defaultLists,
   activeListId: 'inbox',
   isLoading: false,
+  loadError: null,
 };
 
 // Create context
@@ -92,10 +95,24 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
         isLoading: action.payload as boolean
       };
       
+    case 'SET_ERROR':
+      return {
+        ...state,
+        loadError: action.payload as string
+      };
+      
     case 'SET_TODOS':
       return {
         ...state,
-        todos: action.payload as Todo[]
+        todos: action.payload as Todo[],
+        loadError: null
+      };
+      
+    case 'SET_LISTS':
+      return {
+        ...state,
+        lists: action.payload as TodoList[],
+        loadError: null
       };
       
     case 'ADD_TODO': {
@@ -152,12 +169,6 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
       return {
         ...state,
         todos: state.todos.filter(todo => todo.id !== action.payload)
-      };
-      
-    case 'SET_LISTS':
-      return {
-        ...state,
-        lists: action.payload as TodoList[]
       };
       
     case 'ADD_LIST': {
@@ -231,22 +242,35 @@ export function TodoProvider({ children }: { children: React.ReactNode }) {
   
   // Load data from API when authenticated
   useEffect(() => {
-    if (!isAuthenticated || !user) return;
+    if (!isAuthenticated || !user) {
+      console.log("Not authenticated or no user, skipping data load");
+      return;
+    }
     
     const loadData = async () => {
       dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'SET_ERROR', payload: null });
+      
       try {
         console.log('Loading data for user:', user.id);
         
         // Load lists
         const lists = await listService.getAllLists();
+        console.log('Loaded lists:', lists);
         dispatch({ type: 'SET_LISTS', payload: lists });
         
         // Load todos
         const todos = await todoService.getAllTodos();
+        console.log('Loaded todos:', todos);
         dispatch({ type: 'SET_TODOS', payload: todos });
+        
       } catch (error) {
         console.error('Failed to load data:', error);
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: error instanceof Error ? error.message : 'Unknown error loading data'
+        });
+        
         toast({
           title: 'Error',
           description: 'Failed to load your data. Please refresh and try again.',

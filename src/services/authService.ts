@@ -31,6 +31,7 @@ export const authService = {
     const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.login, credentials);
     // Store token in localStorage
     localStorage.setItem('auth_token', response.token);
+    localStorage.setItem('user_data', JSON.stringify(response.user));
     return response;
   },
   
@@ -39,6 +40,7 @@ export const authService = {
     const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.register, userData);
     // Store token in localStorage
     localStorage.setItem('auth_token', response.token);
+    localStorage.setItem('user_data', JSON.stringify(response.user));
     return response;
   },
   
@@ -50,6 +52,7 @@ export const authService = {
     } finally {
       // Remove token from localStorage regardless of server response
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
     }
   },
   
@@ -58,6 +61,7 @@ export const authService = {
     const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.refresh, {});
     // Update token in localStorage
     localStorage.setItem('auth_token', response.token);
+    localStorage.setItem('user_data', JSON.stringify(response.user));
     return response;
   },
   

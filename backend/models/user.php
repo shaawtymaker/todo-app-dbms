@@ -53,7 +53,14 @@ class User {
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':email', $data['email']);
-        $stmt->bindParam(':password', $data['password']);
+        
+        // Hash password if it's not already hashed
+        if (strlen($data['password']) < 60) {
+            $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
+            $stmt->bindParam(':password', $passwordHash);
+        } else {
+            $stmt->bindParam(':password', $data['password']);
+        }
         
         if ($stmt->execute()) {
             return $id;

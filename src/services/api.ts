@@ -7,7 +7,13 @@ const getToken = (): string | null => localStorage.getItem('auth_token');
 // Handle API responses
 const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
+    // Log full response for debugging
+    console.log('API Error Response:', response.status, response.statusText);
+    
+    // Try to parse error message
     const errorData = await response.json().catch(() => ({}));
+    console.log('Error data:', errorData);
+    
     throw new Error(errorData.message || `API Error: ${response.status}`);
   }
   return response.json() as Promise<T>;
@@ -24,6 +30,12 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   if (token) {
     defaultHeaders['Authorization'] = `Bearer ${token}`;
   }
+
+  // Log the request for debugging
+  console.log(`Request: ${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: defaultHeaders
+  });
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
