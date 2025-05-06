@@ -78,14 +78,12 @@ class TodoController {
             return;
         }
         
+        // Add user_id to data
+        $data['user_id'] = $user['id'];
+        $data['completed'] = false; // Set default value
+        
         // Create todo
-        $todo_id = $this->todo_model->create([
-            'text' => $data['text'],
-            'completed' => false,
-            'list_id' => $data['list_id'],
-            'user_id' => $user['id'],
-            'created_at' => date('Y-m-d H:i:s')
-        ]);
+        $todo_id = $this->todo_model->create($data);
         
         if (!$todo_id) {
             http_response_code(500);

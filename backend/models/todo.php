@@ -1,3 +1,4 @@
+
 <?php
 require_once __DIR__ . '/../config/database.php';
 
@@ -24,7 +25,6 @@ class Todo {
         )";
         
         $this->conn->exec($sql);
-        // Removed debug echo statement that was breaking JSON responses
     }
     
     public function findById($id) {

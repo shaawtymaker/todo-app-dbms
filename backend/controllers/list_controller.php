@@ -42,9 +42,9 @@ class ListController {
         
         // Add default lists if they don't exist
         $default_lists = [
-            ['id' => 'inbox', 'name' => 'Inbox', 'color' => '#3b82f6'],
-            ['id' => 'personal', 'name' => 'Personal', 'color' => '#8b5cf6'],
-            ['id' => 'work', 'name' => 'Work', 'color' => '#10b981']
+            ['id' => 'inbox', 'name' => 'Inbox', 'color' => '#3b82f6', 'user_id' => $user['id']],
+            ['id' => 'personal', 'name' => 'Personal', 'color' => '#8b5cf6', 'user_id' => $user['id']],
+            ['id' => 'work', 'name' => 'Work', 'color' => '#10b981', 'user_id' => $user['id']]
         ];
         
         foreach ($default_lists as $default_list) {
@@ -57,6 +57,8 @@ class ListController {
             }
             
             if (!$exists) {
+                // Create the default list in the database
+                $this->list_model->create($default_list);
                 $lists[] = $default_list;
             }
         }
@@ -69,12 +71,20 @@ class ListController {
         
         // Check for default lists
         $default_lists = [
-            'inbox' => ['id' => 'inbox', 'name' => 'Inbox', 'color' => '#3b82f6'],
-            'personal' => ['id' => 'personal', 'name' => 'Personal', 'color' => '#8b5cf6'],
-            'work' => ['id' => 'work', 'name' => 'Work', 'color' => '#10b981']
+            'inbox' => ['id' => 'inbox', 'name' => 'Inbox', 'color' => '#3b82f6', 'user_id' => $user['id']],
+            'personal' => ['id' => 'personal', 'name' => 'Personal', 'color' => '#8b5cf6', 'user_id' => $user['id']],
+            'work' => ['id' => 'work', 'name' => 'Work', 'color' => '#10b981', 'user_id' => $user['id']]
         ];
         
         if (isset($default_lists[$id])) {
+            // Check if it exists in the database already
+            $list = $this->list_model->findById($id);
+            
+            // If not, create it
+            if (!$list) {
+                $this->list_model->create($default_lists[$id]);
+            }
+            
             echo json_encode($default_lists[$id]);
             return;
         }
@@ -104,12 +114,11 @@ class ListController {
             return;
         }
         
+        // Add user_id to data
+        $data['user_id'] = $user['id'];
+        
         // Create list
-        $list_id = $this->list_model->create([
-            'name' => $data['name'],
-            'color' => $data['color'],
-            'user_id' => $user['id']
-        ]);
+        $list_id = $this->list_model->create($data);
         
         if (!$list_id) {
             http_response_code(500);

@@ -39,12 +39,12 @@ class AuthController {
             return;
         }
         
-        // Generate JWT token
+        // Generate JWT token with longer expiration
         $token = $this->jwt_util->generateToken([
             'id' => $user['id'],
             'name' => $user['name'],
             'email' => $user['email']
-        ]);
+        ], 30 * 24 * 60 * 60); // 30 days expiration
         
         // Remove password from response
         unset($user['password']);
@@ -97,12 +97,12 @@ class AuthController {
         // Get created user
         $user = $this->user_model->findById($user_id);
         
-        // Generate JWT token
+        // Generate JWT token with longer expiration
         $token = $this->jwt_util->generateToken([
             'id' => $user['id'],
             'name' => $user['name'],
             'email' => $user['email']
-        ]);
+        ], 30 * 24 * 60 * 60); // 30 days expiration
         
         // Remove password from response
         unset($user['password']);
@@ -143,12 +143,12 @@ class AuthController {
                 throw new Exception('User not found');
             }
             
-            // Generate new token
+            // Generate new token with longer expiration
             $new_token = $this->jwt_util->generateToken([
                 'id' => $user['id'],
                 'name' => $user['name'],
                 'email' => $user['email']
-            ]);
+            ], 30 * 24 * 60 * 60); // 30 days expiration
             
             // Remove password from response
             unset($user['password']);

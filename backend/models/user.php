@@ -23,7 +23,6 @@ class User {
         )";
         
         $this->conn->exec($sql);
-        // Removed debug echo statement that was breaking JSON responses
     }
     
     public function findById($id) {

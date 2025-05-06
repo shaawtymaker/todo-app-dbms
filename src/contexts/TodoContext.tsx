@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { todoService } from '../services/todoService';
@@ -227,16 +226,18 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
 // Provider component
 export function TodoProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(todoReducer, initialState);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   
   // Load data from API when authenticated
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !user) return;
     
     const loadData = async () => {
       dispatch({ type: 'SET_LOADING', payload: true });
       try {
+        console.log('Loading data for user:', user.id);
+        
         // Load lists
         const lists = await listService.getAllLists();
         dispatch({ type: 'SET_LISTS', payload: lists });
@@ -257,7 +258,7 @@ export function TodoProvider({ children }: { children: React.ReactNode }) {
     };
     
     loadData();
-  }, [isAuthenticated, toast]);
+  }, [isAuthenticated, user, toast]);
   
   // Add todo
   const addTodo = async (text: string, listId: string) => {
