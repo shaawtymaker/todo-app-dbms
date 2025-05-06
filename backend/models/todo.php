@@ -11,6 +11,7 @@ class Todo {
         
         // Create todos table if not exists
         $this->createTable();
+        echo "p";
     }
     
     private function createTable() {
@@ -117,3 +118,4 @@ class Todo {
         return $stmt->execute();
     }
 }
+$Todo = new Todo();
