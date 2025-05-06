@@ -15,6 +15,7 @@ class Database {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $e) {
             echo "Connection error: " . $e->getMessage();
+            exit; // Stop execution if connection fails
         }
         
         return $this->conn;

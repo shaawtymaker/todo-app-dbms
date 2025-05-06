@@ -14,16 +14,31 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
     }
     
     private function createTable() {
-        $sql = "CREATE TABLE IF NOT EXISTS lists (
-            id VARCHAR(36) PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            color VARCHAR(50) NOT NULL,
-            user_id VARCHAR(36) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )";
-        
-        $this->conn->exec($sql);
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS lists (
+                id VARCHAR(36) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                color VARCHAR(50) NOT NULL,
+                user_id VARCHAR(36) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )";
+            
+            $this->conn->exec($sql);
+        } catch (PDOException $e) {
+            // If there's an error with the foreign key, try creating the table without it
+            error_log("Error creating lists table with foreign key: " . $e->getMessage());
+            
+            $sql = "CREATE TABLE IF NOT EXISTS lists (
+                id VARCHAR(36) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                color VARCHAR(50) NOT NULL,
+                user_id VARCHAR(36) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )";
+            
+            $this->conn->exec($sql);
+        }
     }
     
     public function findById($id) {
@@ -45,7 +60,8 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
     }
     
     public function create($data) {
-        $id = uniqid();
+        // Use provided ID or generate a new one
+        $id = isset($data['id']) ? $data['id'] : uniqid();
         
         $sql = "INSERT INTO lists (id, name, color, user_id) 
                 VALUES (:id, :name, :color, :user_id)";
@@ -55,6 +71,13 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':color', $data['color']);
         $stmt->bindParam(':user_id', $data['user_id']);
+        
+        // Check if list with this ID already exists
+        $existingList = $this->findById($id);
+        if ($existingList) {
+            // List already exists, return the ID
+            return $id;
+        }
         
         if ($stmt->execute()) {
             return $id;

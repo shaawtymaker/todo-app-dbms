@@ -16,9 +16,15 @@ class ListController {
         // Get authorization header
         $auth_header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
         
-        if (!$auth_header || !preg_match('/^Bearer\s+(.*?)$/', $auth_header, $matches)) {
+        if (!$auth_header) {
             http_response_code(401);
-            echo json_encode(['message' => 'Unauthorized']);
+            echo json_encode(['message' => 'Unauthorized: No Authorization header']);
+            exit;
+        }
+        
+        if (!preg_match('/^Bearer\s+(.*?)$/', $auth_header, $matches)) {
+            http_response_code(401);
+            echo json_encode(['message' => 'Unauthorized: Invalid Authorization format']);
             exit;
         }
         
@@ -29,7 +35,7 @@ class ListController {
             return $user;
         } catch (Exception $e) {
             http_response_code(401);
-            echo json_encode(['message' => 'Token is invalid or expired']);
+            echo json_encode(['message' => 'Unauthorized: ' . $e->getMessage()]);
             exit;
         }
     }

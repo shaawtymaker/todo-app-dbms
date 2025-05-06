@@ -14,17 +14,33 @@ class Todo {
     }
     
     private function createTable() {
-        $sql = "CREATE TABLE IF NOT EXISTS todos (
-            id VARCHAR(36) PRIMARY KEY,
-            text TEXT NOT NULL,
-            completed BOOLEAN DEFAULT FALSE,
-            list_id VARCHAR(36) NOT NULL,
-            user_id VARCHAR(36) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )";
-        
-        $this->conn->exec($sql);
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS todos (
+                id VARCHAR(36) PRIMARY KEY,
+                text TEXT NOT NULL,
+                completed BOOLEAN DEFAULT FALSE,
+                list_id VARCHAR(36) NOT NULL,
+                user_id VARCHAR(36) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )";
+            
+            $this->conn->exec($sql);
+        } catch (PDOException $e) {
+            // If there's an error with the foreign key, try creating the table without it
+            error_log("Error creating todos table with foreign key: " . $e->getMessage());
+            
+            $sql = "CREATE TABLE IF NOT EXISTS todos (
+                id VARCHAR(36) PRIMARY KEY,
+                text TEXT NOT NULL,
+                completed BOOLEAN DEFAULT FALSE,
+                list_id VARCHAR(36) NOT NULL,
+                user_id VARCHAR(36) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )";
+            
+            $this->conn->exec($sql);
+        }
     }
     
     public function findById($id) {
