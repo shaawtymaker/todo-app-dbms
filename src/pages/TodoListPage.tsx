@@ -19,9 +19,23 @@ export default function TodoListPage() {
     }
   }, [listId, dispatch]);
   
+  // If lists are still loading, show a loading message
+  if (state.isLoading) {
+    return <div className="p-6 text-center">Loading lists...</div>;
+  }
+  
+  // If there was an error loading lists, show an error message
+  if (state.loadError) {
+    return <div className="p-6 text-center text-red-500">Error: {state.loadError}</div>;
+  }
+  
   // If list doesn't exist, redirect to inbox
-  if (!list) {
+  if (!list && state.lists.length > 0) {
     return <Navigate to="/lists/inbox" replace />;
+  }
+  
+  if (!list) {
+    return <div className="p-6 text-center">List not found</div>;
   }
   
   return (
