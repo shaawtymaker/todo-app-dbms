@@ -29,7 +29,7 @@ class ListController {
             
             if (!$auth_header) {
                 http_response_code(401);
-                echo "hihi" . json_encode(['message' => 'Unauthorized: No Authorization header']);
+                echo json_encode(['message' => 'Unauthorized: No Authorization header']);
                 exit;
             }
         }

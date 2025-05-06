@@ -11,7 +11,6 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
         
         // Create lists table if not exists
         $this->createTable();
-        echo "hi";
     }
     
     private function createTable() {

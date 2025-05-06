@@ -11,7 +11,6 @@ class User {
         
         // Create users table if not exists
         $this->createTable();
-        echo "f";
     }
     
     private function createTable() {
@@ -70,4 +69,3 @@ class User {
         return false;
     }
 }
-$User = new User(); 

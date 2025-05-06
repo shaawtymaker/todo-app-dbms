@@ -26,20 +26,16 @@ $controller = isset($uri_parts[0]) ? $uri_parts[0] : '';
 $action = isset($uri_parts[1]) ? $uri_parts[1] : '';
 $id = isset($uri_parts[2]) ? $uri_parts[2] : null;
 
-// Debug the Authorization header
-// error_log("Authorization header: " . (isset($_SERVER['HTTP_AUTHORIZATION']) ? $_SERVER['HTTP_AUTHORIZATION'] : 'Not set'));
-// error_log("Request URI: " . $_SERVER['REQUEST_URI']);
-// error_log("Controller: $controller, Action: $action, ID: $id");
-
 // Get Authorization header via getallheaders() if available
 if (!isset($_SERVER['HTTP_AUTHORIZATION'])) {
-    $headers = function_exists('getallheaders') ? getallheaders() : [];
-    
-    // Convert all headers to uppercase for case-insensitive matching
-    $headers = array_change_key_case($headers, CASE_UPPER);
-    
-    if (isset($headers['AUTHORIZATION'])) {
-        $_SERVER['HTTP_AUTHORIZATION'] = $headers['AUTHORIZATION'];
+    if (function_exists('getallheaders')) {
+        $headers = getallheaders();
+        // Convert all headers to uppercase for case-insensitive matching
+        $headers = array_change_key_case($headers, CASE_UPPER);
+        
+        if (isset($headers['AUTHORIZATION'])) {
+            $_SERVER['HTTP_AUTHORIZATION'] = $headers['AUTHORIZATION'];
+        }
     }
 }
 

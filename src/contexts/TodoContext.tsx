@@ -53,7 +53,7 @@ type TodoAction =
   | { type: 'DELETE_LIST'; payload: string }
   | { type: 'SET_ACTIVE_LIST'; payload: string | null }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string };
+  | { type: 'SET_ERROR'; payload: string | null };
 
 interface TodoContextType {
   state: TodoState;
