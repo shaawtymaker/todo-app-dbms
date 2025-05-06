@@ -1,13 +1,13 @@
 
 import { useTodo } from "@/contexts/TodoContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
-import { ListPlus, Plus, Settings, Sun, Moon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ListPlus, Plus, Settings, LayoutDashboard } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
   onNavItemClick?: () => void;
@@ -15,10 +15,11 @@ interface SidebarProps {
 
 export function Sidebar({ onNavItemClick }: SidebarProps) {
   const { state, dispatch } = useTodo();
-  const { theme, toggleTheme } = useTheme();
   const [isNewListDialogOpen, setIsNewListDialogOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [newListColor, setNewListColor] = useState('#8b5cf6');
+  const { user } = useAuth();
+  const location = useLocation();
   
   const handleCreateList = () => {
     if (newListName.trim()) {
@@ -51,6 +52,21 @@ export function Sidebar({ onNavItemClick }: SidebarProps) {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1 px-2">
+          {/* Dashboard link */}
+          <li>
+            <Link 
+              to="/"
+              onClick={onNavItemClick}
+              className={`
+                flex items-center gap-3 px-3 py-2 rounded-md transition-colors
+                ${location.pathname === '/' ? 'bg-primary/10 text-primary' : 'hover:bg-secondary'}
+              `}
+            >
+              <LayoutDashboard size={18} />
+              <span>Dashboard</span>
+            </Link>
+          </li>
+
           {state.lists.map(list => (
             <li key={list.id}>
               <Link 
@@ -58,7 +74,7 @@ export function Sidebar({ onNavItemClick }: SidebarProps) {
                 onClick={onNavItemClick}
                 className={`
                   flex items-center gap-3 px-3 py-2 rounded-md transition-colors
-                  ${state.activeListId === list.id ? 'bg-primary/10 text-primary' : 'hover:bg-secondary'}
+                  ${location.pathname === `/lists/${list.id}` ? 'bg-primary/10 text-primary' : 'hover:bg-secondary'}
                 `}
               >
                 <span 
@@ -124,10 +140,7 @@ export function Sidebar({ onNavItemClick }: SidebarProps) {
       
       {/* Footer */}
       <div className="p-4 border-t">
-        <div className="flex justify-between">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} title="Toggle theme">
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </Button>
+        <div className="flex justify-end">
           <Button variant="ghost" size="icon" asChild>
             <Link to="/settings" onClick={onNavItemClick}>
               <Settings size={20} />

@@ -27,18 +27,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (authService.isAuthenticated()) {
           try {
             // In a real implementation, we would fetch user data from an endpoint
-            // For now, we'll check if the token is valid by trying to refresh it
-            const response = await authService.refreshToken();
-            setUser(response.user);
+            // For now, we'll set a user from the localStorage if available
+            const storedUser = localStorage.getItem('user_data');
+            if (storedUser) {
+              setUser(JSON.parse(storedUser));
+            } else {
+              // Try to refresh the token to get user data
+              const response = await authService.refreshToken();
+              setUser(response.user);
+              localStorage.setItem('user_data', JSON.stringify(response.user));
+            }
           } catch (error) {
             console.error('Token invalid or expired:', error);
             // Clear invalid token
             localStorage.removeItem('auth_token');
-            toast({
-              title: "Session expired",
-              description: "Please login again",
-              variant: "destructive",
-            });
+            localStorage.removeItem('user_data');
           }
         }
       } catch (error) {
@@ -57,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await authService.login({ email, password });
       setUser(response.user);
+      localStorage.setItem('user_data', JSON.stringify(response.user));
       return response;
     } catch (error) {
       console.error('Login failed:', error);
@@ -82,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password_confirmation: passwordConfirmation,
       });
       setUser(response.user);
+      localStorage.setItem('user_data', JSON.stringify(response.user));
       return response;
     } catch (error) {
       console.error('Registration failed:', error);
@@ -97,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.logout();
       setUser(null);
+      localStorage.removeItem('user_data');
     } finally {
       setIsLoading(false);
     }

@@ -4,14 +4,24 @@ import { Outlet } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon, Monitor } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Menu, X, LogOut, User, Settings } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 export default function AppLayout() {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
-  const { theme, setTheme, activeTheme } = useTheme();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   
   // Close sidebar when switching to mobile
   useEffect(() => {
@@ -21,6 +31,23 @@ export default function AppLayout() {
       setSidebarOpen(true);
     }
   }, [isMobile]);
+
+  // Handle logout
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user || !user.name) return 'U';
+    return user.name
+      .split(' ')
+      .map((name) => name[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
   
   return (
     <div className="flex min-h-screen bg-background">
@@ -53,19 +80,34 @@ export default function AppLayout() {
         ${!isMobile && !sidebarOpen ? 'ml-0' : ''}
       `}>
         <div className="container max-w-4xl py-8 px-4 md:px-8">
-          {/* Theme switcher */}
+          {/* Profile dropdown */}
           <div className="flex justify-end mb-6">
-            <ToggleGroup type="single" value={theme} onValueChange={(value) => value && setTheme(value as 'light' | 'dark' | 'system')}>
-              <ToggleGroupItem value="light" aria-label="Light mode" className="px-3">
-                <Sun size={18} className={theme === 'light' ? 'text-primary' : ''} />
-              </ToggleGroupItem>
-              <ToggleGroupItem value="system" aria-label="System theme" className="px-3">
-                <Monitor size={18} className={theme === 'system' ? 'text-primary' : ''} />
-              </ToggleGroupItem>
-              <ToggleGroupItem value="dark" aria-label="Dark mode" className="px-3">
-                <Moon size={18} className={theme === 'dark' ? 'text-primary' : ''} />
-              </ToggleGroupItem>
-            </ToggleGroup>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full w-10 h-10">
+                  <Avatar>
+                    <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/settings')}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           {/* Main content */}

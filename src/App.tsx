@@ -8,7 +8,7 @@ import { TodoProvider } from "./contexts/TodoContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import AppLayout from "./components/Layout/AppLayout";
-import Index from "./pages/Index";
+import DashboardPage from "./pages/DashboardPage";
 import TodoListPage from "./pages/TodoListPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
@@ -60,7 +60,7 @@ const App = () => (
                     <AppLayout />
                   </ProtectedRoute>
                 }>
-                  <Route index element={<Index />} />
+                  <Route index element={<DashboardPage />} />
                   <Route path="lists/:listId" element={<TodoListPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                 </Route>
