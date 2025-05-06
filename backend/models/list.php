@@ -112,4 +112,3 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
         return $stmt->execute();
     }
 }
-$Listmodel = 
