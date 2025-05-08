@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -12,9 +12,16 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,19 +38,16 @@ export default function LoginPage() {
     setIsSubmitting(true);
     
     try {
-      await login(email, password);
-      toast({
-        title: "Welcome back!",
-        description: "You've been logged in successfully",
-      });
-      navigate("/");
+      const response = await login(email, password);
+      if (response) {
+        toast({
+          title: "Welcome back!",
+          description: "You've been logged in successfully",
+        });
+        navigate('/');
+      }
     } catch (error) {
       console.error("Login failed:", error);
-      toast({
-        title: "Login failed",
-        description: "Please check your credentials and try again",
-        variant: "destructive",
-      });
     } finally {
       setIsSubmitting(false);
     }

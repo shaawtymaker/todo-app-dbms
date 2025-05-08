@@ -33,7 +33,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setActiveTheme(systemTheme);
         return systemTheme;
       } else {
-        setActiveTheme(theme);
+        setActiveTheme(theme as ActiveTheme);
         return theme;
       }
     };

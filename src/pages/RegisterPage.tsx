@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -14,9 +14,16 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register } = useAuth();
+  const { register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,19 +49,16 @@ export default function RegisterPage() {
     setIsSubmitting(true);
     
     try {
-      await register(name, email, password, passwordConfirmation);
-      toast({
-        title: "Registration successful",
-        description: "Your account has been created",
-      });
-      navigate("/");
+      const response = await register(name, email, password, passwordConfirmation);
+      if (response) {
+        toast({
+          title: "Registration successful",
+          description: "Your account has been created",
+        });
+        navigate('/');
+      }
     } catch (error) {
       console.error("Registration failed:", error);
-      toast({
-        title: "Registration failed",
-        description: "Please check your information and try again",
-        variant: "destructive",
-      });
     } finally {
       setIsSubmitting(false);
     }

@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { authService, User, AuthResponse } from '../services/authService';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -26,17 +27,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Check if token exists
         if (authService.isAuthenticated()) {
           try {
-            // In a real implementation, we would fetch user data from an endpoint
-            // For now, we'll set a user from the localStorage if available
-            const storedUser = localStorage.getItem('user_data');
-            if (storedUser) {
-              setUser(JSON.parse(storedUser));
-            } else {
-              // Try to refresh the token to get user data
-              const response = await authService.refreshToken();
-              setUser(response.user);
-              localStorage.setItem('user_data', JSON.stringify(response.user));
-            }
+            // Try to refresh the token to get user data
+            const response = await authService.refreshToken();
+            setUser(response.user);
+            localStorage.setItem('user_data', JSON.stringify(response.user));
           } catch (error) {
             console.error('Token invalid or expired:', error);
             // Clear invalid token
@@ -52,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     
     checkAuth();
-  }, [toast]);
+  }, []);
   
   // Login handler
   const login = async (email: string, password: string): Promise<AuthResponse | undefined> => {
@@ -64,6 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return response;
     } catch (error) {
       console.error('Login failed:', error);
+      toast({
+        title: "Login failed",
+        description: "Please check your credentials and try again",
+        variant: "destructive",
+      });
       return undefined;
     } finally {
       setIsLoading(false);
@@ -90,6 +89,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return response;
     } catch (error) {
       console.error('Registration failed:', error);
+      toast({
+        title: "Registration failed",
+        description: "Please check your information and try again",
+        variant: "destructive",
+      });
       return undefined;
     } finally {
       setIsLoading(false);
@@ -103,6 +107,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await authService.logout();
       setUser(null);
       localStorage.removeItem('user_data');
+      localStorage.removeItem('auth_token');
+    } catch (error) {
+      console.error('Logout failed:', error);
     } finally {
       setIsLoading(false);
     }
