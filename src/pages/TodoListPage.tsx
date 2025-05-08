@@ -1,6 +1,6 @@
 
 import { useParams, Navigate } from "react-router-dom";
-import { useTodo } from "@/contexts/TodoContext";
+import { useTodo } from "@/contexts/todo";
 import { TodoListView } from "@/components/Todo/TodoList";
 import { TodoProgress } from "@/components/Todo/TodoProgress";
 import { Card } from "@/components/ui/card"; 

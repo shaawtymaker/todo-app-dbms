@@ -1,5 +1,4 @@
-
-import { Todo, useTodo } from "@/contexts/TodoContext";
+import { Todo, useTodo } from "@/contexts/todo";
 import { TodoItem } from "./TodoItem";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +15,7 @@ interface TodoListProps {
 }
 
 export function TodoListView({ listId, title, color }: TodoListProps) {
-  const { state, dispatch } = useTodo();
+  const { state, dispatch, addTodo } = useTodo();
   const [newTodoText, setNewTodoText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   
@@ -45,10 +44,7 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTodoText.trim()) {
-      dispatch({
-        type: 'ADD_TODO',
-        payload: { text: newTodoText.trim(), listId }
-      });
+      addTodo(newTodoText.trim(), listId);
       setNewTodoText("");
     }
   };

@@ -1,6 +1,6 @@
 
 // API base URL - change this to point to your PHP backend
-export const API_BASE_URL = 'http://localhost/todo-app-dbms/backend/api';
+export const API_BASE_URL = '/todo-app-dbms/backend/api';
 
 // API endpoints
 export const API_ENDPOINTS = {

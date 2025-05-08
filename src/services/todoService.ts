@@ -1,7 +1,7 @@
 
 import { apiClient } from "./api";
 import { API_ENDPOINTS } from "../config/api";
-import { Todo } from "@/contexts/TodoContext";
+import { Todo } from "@/contexts/todo";
 
 // Interface for todo that matches our backend schema
 export interface TodoDTO {
@@ -16,7 +16,7 @@ export interface TodoDTO {
 const mapToTodo = (dto: TodoDTO): Todo => ({
   id: dto.id,
   text: dto.text,
-  completed: dto.completed,
+  completed: dto.completed === true || dto.completed === 1 || dto.completed === "1",
   listId: dto.list_id,
   createdAt: new Date(dto.created_at).getTime(),
 });
@@ -32,14 +32,36 @@ const mapToDTO = (todo: Partial<Todo>): Partial<TodoDTO> => ({
 export const todoService = {
   // Get all todos
   async getAllTodos(): Promise<Todo[]> {
-    const response = await apiClient.get<TodoDTO[]>(API_ENDPOINTS.todos);
-    return response.map(mapToTodo);
+    try {
+      const response = await apiClient.get<TodoDTO[]>(API_ENDPOINTS.todos);
+      
+      if (!Array.isArray(response)) {
+        console.error('Invalid response from todos API:', response);
+        return [];
+      }
+      
+      return response.map(mapToTodo);
+    } catch (error) {
+      console.error('Error fetching todos:', error);
+      return [];
+    }
   },
   
   // Get todos by list ID
   async getTodosByList(listId: string): Promise<Todo[]> {
-    const response = await apiClient.get<TodoDTO[]>(`${API_ENDPOINTS.todos}?list_id=${listId}`);
-    return response.map(mapToTodo);
+    try {
+      const response = await apiClient.get<TodoDTO[]>(`${API_ENDPOINTS.todos}?list_id=${listId}`);
+      
+      if (!Array.isArray(response)) {
+        console.error('Invalid response from todos by list API:', response);
+        return [];
+      }
+      
+      return response.map(mapToTodo);
+    } catch (error) {
+      console.error('Error fetching todos by list:', error);
+      return [];
+    }
   },
   
   // Create a new todo

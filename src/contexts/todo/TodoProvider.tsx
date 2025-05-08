@@ -107,6 +107,11 @@ export function TodoProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'DELETE_TODO', payload: tempId });
       dispatch({ type: 'ADD_TODO', payload: savedTodo });
       
+      toast({
+        title: 'Success',
+        description: 'Task added successfully.',
+      });
+      
     } catch (error) {
       console.error('Failed to add todo:', error);
       toast({
@@ -157,6 +162,11 @@ export function TodoProvider({ children }: { children: React.ReactNode }) {
       // API call
       const updatedTodo = await todoService.updateTodo(id, { text });
       dispatch({ type: 'UPDATE_TODO', payload: updatedTodo });
+      
+      toast({
+        title: 'Success',
+        description: 'Task updated successfully.',
+      });
     } catch (error) {
       console.error('Failed to edit todo:', error);
       toast({
@@ -183,6 +193,11 @@ export function TodoProvider({ children }: { children: React.ReactNode }) {
       
       // API call
       await todoService.deleteTodo(id);
+      
+      toast({
+        title: 'Success',
+        description: 'Task deleted successfully.',
+      });
     } catch (error) {
       console.error('Failed to delete todo:', error);
       toast({
@@ -241,6 +256,11 @@ export function TodoProvider({ children }: { children: React.ReactNode }) {
       // API call
       const updatedList = await listService.updateList(id, { name, color });
       dispatch({ type: 'UPDATE_LIST', payload: updatedList });
+      
+      toast({
+        title: 'Success',
+        description: 'List updated successfully.',
+      });
     } catch (error) {
       console.error('Failed to edit list:', error);
       toast({

@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useTodo } from "@/contexts/TodoContext";
+import { useTodo } from "@/contexts/todo";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -13,7 +12,7 @@ import { useState } from "react";
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
-  const { state, dispatch } = useTodo();
+  const { state, addList, editList, deleteList } = useTodo();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingList, setEditingList] = useState<{ id: string, name: string, color: string } | null>(null);
   
@@ -22,20 +21,17 @@ export default function SettingsPage() {
   
   const handleDeleteList = (id: string) => {
     if (id !== 'inbox') {
-      dispatch({ type: 'DELETE_LIST', payload: id });
+      deleteList(id);
     }
   };
   
   const handleEditList = () => {
     if (editingList && editingList.name.trim()) {
-      dispatch({
-        type: 'EDIT_LIST',
-        payload: {
-          id: editingList.id,
-          name: editingList.name.trim(),
-          color: editingList.color
-        }
-      });
+      editList(
+        editingList.id,
+        editingList.name.trim(),
+        editingList.color
+      );
       setIsDialogOpen(false);
       setEditingList(null);
     }

@@ -34,8 +34,13 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
   
   // Try to parse the response as JSON
   try {
+    // Handle empty responses
+    if (!responseText.trim()) {
+      return {} as T;
+    }
+    
     // Some PHP errors might output text before JSON, try to extract JSON
-    const jsonMatch = responseText.match(/{.*}/s);
+    const jsonMatch = responseText.match(/{.*}/s) || responseText.match(/\[.*\]/s);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
@@ -60,11 +65,9 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   // Log the request for debugging
   console.log(`Request: ${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      ...defaultHeaders,
-      ...options.headers
-    }
+    method: options.method || 'GET',
+    headers: defaultHeaders,
+    body: options.body ? '(data)' : undefined
   });
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {

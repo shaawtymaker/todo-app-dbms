@@ -1,7 +1,7 @@
 
 import { apiClient } from "./api";
 import { API_ENDPOINTS } from "../config/api";
-import { TodoList } from "@/contexts/TodoContext";
+import { TodoList } from "@/contexts/todo";
 
 // Interface for list that matches our backend schema
 export interface ListDTO {
@@ -38,17 +38,8 @@ export const listService = {
   
   // Create a new list
   async createList(list: { name: string; color: string }): Promise<TodoList> {
-    try {
-      const response = await apiClient.post<ListDTO>(API_ENDPOINTS.lists, list);
-      return response;
-    } catch (error) {
-      console.error('Error creating list:', error);
-      // Return a temporary list with a uuid that will be replaced when sync works
-      return {
-        id: `temp_${Date.now()}`,
-        ...list
-      };
-    }
+    const response = await apiClient.post<ListDTO>(API_ENDPOINTS.lists, list);
+    return response;
   },
   
   // Update a list

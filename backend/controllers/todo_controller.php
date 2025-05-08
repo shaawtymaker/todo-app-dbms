@@ -1,59 +1,20 @@
 
 <?php
-require_once __DIR__ . '/../utils/jwt_util.php';
+require_once __DIR__ . '/../middlewares/AuthMiddleware.php';
 require_once __DIR__ . '/../models/todo.php';
 
 class TodoController {
     private $todo_model;
-    private $jwt_util;
+    private $auth_middleware;
     
     public function __construct() {
         $this->todo_model = new Todo();
-        $this->jwt_util = new JWTUtil();
-    }
-    
-    private function authenticate() {
-        // Get authorization header
-        $auth_header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        
-        if (!$auth_header) {
-            // Try to get from getAllHeaders if available
-            if (function_exists('getallheaders')) {
-                $headers = getallheaders();
-                // Convert all headers to uppercase for case-insensitive matching
-                $headers = array_change_key_case($headers, CASE_UPPER);
-                if (isset($headers['AUTHORIZATION'])) {
-                    $auth_header = $headers['AUTHORIZATION'];
-                }
-            }
-            
-            if (!$auth_header) {
-                http_response_code(401);
-                echo json_encode(['message' => 'Unauthorized: No Authorization header']);
-                exit;
-            }
-        }
-        
-        if (!preg_match('/^Bearer\s+(.*?)$/', $auth_header, $matches)) {
-            http_response_code(401);
-            echo json_encode(['message' => 'Unauthorized: Invalid Authorization format']);
-            exit;
-        }
-        
-        $token = $matches[1];
-        
-        try {
-            $user = $this->jwt_util->validateToken($token);
-            return $user;
-        } catch (Exception $e) {
-            http_response_code(401);
-            echo json_encode(['message' => 'Unauthorized: ' . $e->getMessage()]);
-            exit;
-        }
+        $this->auth_middleware = new AuthMiddleware();
     }
     
     public function getAll() {
-        $user = $this->authenticate();
+        // Authenticate the user
+        $user = $this->auth_middleware->authenticate();
         
         // Get query parameters
         $list_id = $_GET['list_id'] ?? null;
@@ -69,7 +30,7 @@ class TodoController {
     }
     
     public function getById($id) {
-        $user = $this->authenticate();
+        $user = $this->auth_middleware->authenticate();
         
         // Get todo
         $todo = $this->todo_model->findById($id);
@@ -84,7 +45,7 @@ class TodoController {
     }
     
     public function create() {
-        $user = $this->authenticate();
+        $user = $this->auth_middleware->authenticate();
         
         // Get request data
         $data = json_decode(file_get_contents('php://input'), true);
@@ -116,7 +77,7 @@ class TodoController {
     }
     
     public function update($id) {
-        $user = $this->authenticate();
+        $user = $this->auth_middleware->authenticate();
         
         // Get todo
         $todo = $this->todo_model->findById($id);
@@ -146,7 +107,7 @@ class TodoController {
     }
     
     public function toggle($id) {
-        $user = $this->authenticate();
+        $user = $this->auth_middleware->authenticate();
         
         // Get todo
         $todo = $this->todo_model->findById($id);
@@ -175,7 +136,7 @@ class TodoController {
     }
     
     public function delete($id) {
-        $user = $this->authenticate();
+        $user = $this->auth_middleware->authenticate();
         
         // Get todo
         $todo = $this->todo_model->findById($id);
