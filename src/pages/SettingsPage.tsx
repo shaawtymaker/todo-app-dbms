@@ -17,6 +17,9 @@ export default function SettingsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingList, setEditingList] = useState<{ id: string, name: string, color: string } | null>(null);
   
+  // Make sure lists is always an array
+  const lists = Array.isArray(state.lists) ? state.lists : [];
+  
   const handleDeleteList = (id: string) => {
     if (id !== 'inbox') {
       dispatch({ type: 'DELETE_LIST', payload: id });
@@ -75,7 +78,7 @@ export default function SettingsPage() {
           <CardTitle>Lists</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {state.lists.map(list => (
+          {lists.map(list => (
             <div key={list.id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div 
@@ -108,7 +111,7 @@ export default function SettingsPage() {
             </div>
           ))}
           
-          {state.lists.length === 1 && (
+          {lists.length === 1 && (
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>

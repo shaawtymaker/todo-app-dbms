@@ -20,7 +20,10 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
   const [newTodoText, setNewTodoText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   
-  const todos = state.todos.filter(todo => todo.listId === listId);
+  // Make sure todos is always an array
+  const allTodos = Array.isArray(state.todos) ? state.todos : [];
+  
+  const todos = allTodos.filter(todo => todo.listId === listId);
   const incompleteTodos = todos.filter(todo => !todo.completed);
   const completedTodos = todos.filter(todo => todo.completed);
   

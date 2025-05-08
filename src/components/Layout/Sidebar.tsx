@@ -42,6 +42,9 @@ export function Sidebar({ onNavItemClick }: SidebarProps) {
     '#ec4899', // pink
   ];
 
+  // Make sure lists is always an array
+  const lists = Array.isArray(state.lists) ? state.lists : [];
+
   return (
     <aside className="flex flex-col h-full">
       {/* App title */}
@@ -67,7 +70,7 @@ export function Sidebar({ onNavItemClick }: SidebarProps) {
             </Link>
           </li>
 
-          {state.lists.map(list => (
+          {lists.map(list => (
             <li key={list.id}>
               <Link 
                 to={`/lists/${list.id}`}
@@ -83,7 +86,7 @@ export function Sidebar({ onNavItemClick }: SidebarProps) {
                 />
                 <span>{list.name}</span>
                 <span className="ml-auto text-xs text-muted-foreground">
-                  {state.todos.filter(todo => todo.listId === list.id && !todo.completed).length}
+                  {Array.isArray(state.todos) ? state.todos.filter(todo => todo.listId === list.id && !todo.completed).length : 0}
                 </span>
               </Link>
             </li>

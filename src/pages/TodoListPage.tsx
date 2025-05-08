@@ -10,7 +10,10 @@ export default function TodoListPage() {
   const { listId } = useParams<{ listId: string }>();
   const { state, dispatch } = useTodo();
   
-  const list = state.lists.find(l => l.id === listId);
+  // Make sure lists is always an array
+  const lists = Array.isArray(state.lists) ? state.lists : [];
+  
+  const list = lists.find(l => l.id === listId);
   
   // Set active list when navigating to this page
   useEffect(() => {
@@ -30,7 +33,7 @@ export default function TodoListPage() {
   }
   
   // If list doesn't exist, redirect to inbox
-  if (!list && state.lists.length > 0) {
+  if (!list && lists.length > 0) {
     return <Navigate to="/lists/inbox" replace />;
   }
   

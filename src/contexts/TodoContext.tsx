@@ -104,14 +104,14 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
     case 'SET_TODOS':
       return {
         ...state,
-        todos: action.payload as Todo[],
+        todos: Array.isArray(action.payload) ? action.payload as Todo[] : [],
         loadError: null
       };
       
     case 'SET_LISTS':
       return {
         ...state,
-        lists: action.payload as TodoList[],
+        lists: Array.isArray(action.payload) ? action.payload as TodoList[] : [...defaultLists],
         loadError: null
       };
       
@@ -257,15 +257,36 @@ export function TodoProvider({ children }: { children: React.ReactNode }) {
         // Load lists
         const lists = await listService.getAllLists();
         console.log('Loaded lists:', lists);
-        dispatch({ type: 'SET_LISTS', payload: lists });
+        
+        if (lists && Array.isArray(lists)) {
+          dispatch({ type: 'SET_LISTS', payload: lists });
+        } else {
+          console.error('Lists data is not an array:', lists);
+          dispatch({ type: 'SET_LISTS', payload: defaultLists });
+          
+          // Show toast with error
+          toast({
+            title: 'Warning',
+            description: 'Could not load your lists. Using defaults.',
+            variant: 'destructive',
+          });
+        }
         
         // Load todos
         const todos = await todoService.getAllTodos();
         console.log('Loaded todos:', todos);
-        dispatch({ type: 'SET_TODOS', payload: todos });
+        
+        if (todos && Array.isArray(todos)) {
+          dispatch({ type: 'SET_TODOS', payload: todos });
+        } else {
+          console.error('Todos data is not an array:', todos);
+          dispatch({ type: 'SET_TODOS', payload: [] });
+        }
         
       } catch (error) {
         console.error('Failed to load data:', error);
+        // Set default lists when there's an error
+        dispatch({ type: 'SET_LISTS', payload: defaultLists });
         dispatch({ 
           type: 'SET_ERROR', 
           payload: error instanceof Error ? error.message : 'Unknown error loading data'
