@@ -7,7 +7,7 @@ import { Todo } from "@/contexts/todo";
 export interface TodoDTO {
   id: string;
   text: string;
-  completed: boolean;
+  completed: boolean | number | string;
   list_id: string;
   created_at: string;
 }
@@ -16,7 +16,10 @@ export interface TodoDTO {
 const mapToTodo = (dto: TodoDTO): Todo => ({
   id: dto.id,
   text: dto.text,
-  completed: dto.completed === true || dto.completed === 1 || dto.completed === "1",
+  completed: dto.completed === true || 
+             dto.completed === 1 || 
+             dto.completed === '1' || 
+             dto.completed === 'true',
   listId: dto.list_id,
   createdAt: new Date(dto.created_at).getTime(),
 });
