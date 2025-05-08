@@ -1,11 +1,14 @@
 
 import { TodoProvider } from './TodoProvider';
 import { useTodo } from './TodoContext';
-import { Todo, TodoList, TodoState, TodoAction, TodoContextType } from './types';
+import type { Todo, TodoList, TodoState, TodoAction, TodoContextType } from './types';
 
 export {
   TodoProvider,
   useTodo,
+};
+
+export type {
   Todo,
   TodoList,
   TodoState,

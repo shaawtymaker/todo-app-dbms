@@ -1,8 +1,7 @@
 
 // Re-export from the refactored module
-import { 
-  TodoProvider, 
-  useTodo, 
+import { TodoProvider, useTodo } from './todo';
+import type { 
   Todo, 
   TodoList,
   TodoState,
@@ -12,7 +11,10 @@ import {
 
 export { 
   TodoProvider, 
-  useTodo, 
+  useTodo 
+};
+
+export type { 
   Todo, 
   TodoList,
   TodoState,
