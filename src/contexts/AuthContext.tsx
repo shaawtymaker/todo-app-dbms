@@ -22,10 +22,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   
+  console.log("Auth context initialized, current path:", location.pathname);
+  
   // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log("Checking authentication status...");
+        
         // Check if token exists
         if (authService.isAuthenticated()) {
           // Get user from localStorage first
@@ -39,12 +43,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           
           // Don't try to refresh token if we're on login/register pages
-          if (location.pathname !== '/login' && location.pathname !== '/register') {
+          const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+          console.log("Is on auth page:", isAuthPage);
+          
+          if (!isAuthPage) {
             try {
               // Try to refresh the token to verify it's still valid
+              console.log("Attempting to refresh token...");
               const response = await authService.refreshToken();
               setUser(response.user);
-              localStorage.setItem('user_data', JSON.stringify(response.user));
               console.log("Token refreshed successfully, user:", response.user);
             } catch (error) {
               console.error('Token invalid or expired:', error);
@@ -56,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } else {
           console.log("No authentication token found");
+          setUser(null);
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -65,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
       } finally {
         setIsLoading(false);
+        console.log("Auth check completed, isLoading set to false");
       }
     };
     
@@ -75,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<AuthResponse | undefined> => {
     setIsLoading(true);
     try {
+      console.log("Attempting login with email:", email);
       const response = await authService.login({ email, password });
       setUser(response.user);
       
@@ -85,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Redirect to home page or intended destination
       const from = location.state?.from?.pathname || '/';
+      console.log("Redirecting after login to:", from);
       navigate(from, { replace: true });
       
       return response;
@@ -110,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ): Promise<AuthResponse | undefined> => {
     setIsLoading(true);
     try {
+      console.log("Attempting registration with email:", email);
       const response = await authService.register({
         name,
         email,
@@ -124,6 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       // Redirect to home page
+      console.log("Redirecting after registration to home page");
       navigate('/', { replace: true });
       
       return response;
@@ -144,13 +157,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
+      console.log("Logging out user");
       await authService.logout();
       setUser(null);
-      navigate('/login');
+      
       toast({
         title: "Logged out",
         description: "You've been successfully logged out",
       });
+      
+      // Always navigate to login after logout
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
       toast({
@@ -168,20 +185,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
   
+  // Value object for context provider
+  const contextValue: AuthContextType = {
+    user,
+    isLoading,
+    isAuthenticated: !!user,
+    login,
+    register,
+    logout
+  };
+  
+  // Return the wrapped provider
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isLoading, 
-      isAuthenticated: !!user,
-      login, 
-      register, 
-      logout 
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
 }
 
+// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

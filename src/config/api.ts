@@ -1,8 +1,8 @@
 
-// API base URL - change this to point to your PHP backend
-export const API_BASE_URL = '/api';
+// API base URL - this should be changed according to your backend setup
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
-// API endpoints
+// API endpoints - make sure these match your backend routes
 export const API_ENDPOINTS = {
   auth: {
     login: '/auth/login',
@@ -13,3 +13,8 @@ export const API_ENDPOINTS = {
   todos: '/todos',
   lists: '/lists',
 };
+
+console.log('API configuration loaded:', { 
+  API_BASE_URL,
+  endpoints: API_ENDPOINTS
+});

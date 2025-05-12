@@ -32,8 +32,22 @@ export const authService = {
       const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.login, credentials);
       console.log("Login response:", response);
       
-      if (!response || !response.token || !response.user) {
-        throw new Error("Invalid response from server");
+      // Validate the response structure
+      if (!response || typeof response !== 'object') {
+        console.error('Invalid response format:', response);
+        throw new Error("Invalid response format from server");
+      }
+      
+      // Check for essential properties
+      if (!response.token || !response.user) {
+        console.error('Missing token or user in response:', response);
+        throw new Error("Invalid response data: missing token or user");
+      }
+      
+      // Validate user object
+      if (!response.user.id || !response.user.email) {
+        console.error('Invalid user object in response:', response.user);
+        throw new Error("Invalid user data in response");
       }
       
       // Store token in localStorage
@@ -52,8 +66,22 @@ export const authService = {
       const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.register, userData);
       console.log("Registration response:", response);
       
-      if (!response || !response.token || !response.user) {
-        throw new Error("Invalid response from server");
+      // Validate the response structure
+      if (!response || typeof response !== 'object') {
+        console.error('Invalid response format:', response);
+        throw new Error("Invalid response format from server");
+      }
+      
+      // Check for essential properties
+      if (!response.token || !response.user) {
+        console.error('Missing token or user in response:', response);
+        throw new Error("Invalid response data: missing token or user");
+      }
+      
+      // Validate user object
+      if (!response.user.id || !response.user.email) {
+        console.error('Invalid user object in response:', response.user);
+        throw new Error("Invalid user data in response");
       }
       
       // Store token in localStorage
@@ -85,8 +113,14 @@ export const authService = {
     try {
       const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.refresh, {});
       
-      if (!response || !response.token || !response.user) {
-        throw new Error("Invalid response from server");
+      // Validate the response structure
+      if (!response || typeof response !== 'object') {
+        throw new Error("Invalid response format from server");
+      }
+      
+      // Check for essential properties
+      if (!response.token || !response.user) {
+        throw new Error("Invalid response data: missing token or user");
       }
       
       // Update token in localStorage
@@ -119,6 +153,8 @@ export const authService = {
       return userData ? JSON.parse(userData) : null;
     } catch (error) {
       console.error('Error parsing user data:', error);
+      // Clear potentially corrupted data
+      localStorage.removeItem('user_data');
       return null;
     }
   }

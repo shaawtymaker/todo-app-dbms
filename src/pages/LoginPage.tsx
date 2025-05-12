@@ -13,16 +13,19 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  console.log("LoginPage rendered, auth state:", { isAuthenticated, isLoading });
+  
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isLoading) {
+      console.log("Already authenticated, redirecting to home");
       navigate('/', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,10 +42,16 @@ export default function LoginPage() {
     setIsSubmitting(true);
     
     try {
+      console.log("Submitting login form");
       await login(email, password);
       // The redirection is handled in the login function in AuthContext
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Login form submission error:", error);
+      toast({
+        title: "Login Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -54,7 +63,7 @@ export default function LoginPage() {
         <ThemeToggle />
       </div>
       <div className="flex items-center justify-center flex-1">
-        <Card className="w-full max-w-md animate-slide-up">
+        <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
           </CardHeader>
@@ -94,7 +103,7 @@ export default function LoginPage() {
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={isSubmitting}
+                disabled={isSubmitting || isLoading}
               >
                 {isSubmitting ? "Logging in..." : "Log in"}
               </Button>

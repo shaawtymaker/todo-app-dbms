@@ -8,7 +8,12 @@ const getToken = (): string | null => localStorage.getItem('auth_token');
 const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
     // First try to get the response body as text
-    const responseText = await response.text();
+    let responseText;
+    try {
+      responseText = await response.text();
+    } catch (e) {
+      throw new Error(`API Error: ${response.status}`);
+    }
     
     // Log full response for debugging
     console.log('API Error Response:', response.status, response.statusText);
@@ -32,12 +37,13 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
     throw new Error(errorData.message || `API Error: ${response.status}`);
   }
   
-  // First try to get the response body as text
+  // Handle empty responses safely
   try {
     const responseText = await response.text();
     
     // Handle empty responses
-    if (!responseText.trim()) {
+    if (!responseText || !responseText.trim()) {
+      console.log('Empty response received');
       return {} as T;
     }
     
