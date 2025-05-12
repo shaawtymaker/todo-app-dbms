@@ -67,7 +67,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   console.log(`Request: ${API_BASE_URL}${endpoint}`, {
     method: options.method || 'GET',
     headers: defaultHeaders,
-    body: options.body ? '(data)' : undefined
+    body: options.body ? JSON.parse(options.body as string) : undefined
   });
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {

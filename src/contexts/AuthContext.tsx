@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { authService, User, AuthResponse } from '../services/authService';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -19,6 +19,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
   
   // Check authentication status on mount
   useEffect(() => {
@@ -26,16 +28,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         // Check if token exists
         if (authService.isAuthenticated()) {
+          // Get user from localStorage first
+          const storedUser = authService.getCurrentUser();
+          
+          if (storedUser) {
+            setUser(storedUser);
+            console.log("User authenticated from localStorage:", storedUser);
+          }
+          
           try {
-            // Try to refresh the token to get user data
+            // Try to refresh the token to verify it's still valid
             const response = await authService.refreshToken();
             setUser(response.user);
             localStorage.setItem('user_data', JSON.stringify(response.user));
+            console.log("Token refreshed successfully, user:", response.user);
           } catch (error) {
             console.error('Token invalid or expired:', error);
             // Clear invalid token
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_data');
+            setUser(null);
           }
         }
       } catch (error) {
@@ -54,7 +66,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await authService.login({ email, password });
       setUser(response.user);
-      localStorage.setItem('user_data', JSON.stringify(response.user));
+      
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      
+      // Redirect to home page or intended destination
+      const from = location.state?.from?.pathname || '/';
+      navigate(from, { replace: true });
+      
       return response;
     } catch (error) {
       console.error('Login failed:', error);
@@ -85,7 +106,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password_confirmation: passwordConfirmation,
       });
       setUser(response.user);
-      localStorage.setItem('user_data', JSON.stringify(response.user));
+      
+      toast({
+        title: "Registration successful",
+        description: "Your account has been created",
+      });
+      
+      // Redirect to home page
+      navigate('/', { replace: true });
+      
       return response;
     } catch (error) {
       console.error('Registration failed:', error);
@@ -106,10 +135,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.logout();
       setUser(null);
-      localStorage.removeItem('user_data');
-      localStorage.removeItem('auth_token');
+      navigate('/login');
+      toast({
+        title: "Logged out",
+        description: "You've been successfully logged out",
+      });
     } catch (error) {
       console.error('Logout failed:', error);
+      toast({
+        title: "Logout failed",
+        description: "An error occurred while logging out",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
