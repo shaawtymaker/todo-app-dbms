@@ -34,31 +34,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (storedUser) {
             setUser(storedUser);
             console.log("User authenticated from localStorage:", storedUser);
+          } else {
+            console.log("No user found in localStorage");
           }
           
-          try {
-            // Try to refresh the token to verify it's still valid
-            const response = await authService.refreshToken();
-            setUser(response.user);
-            localStorage.setItem('user_data', JSON.stringify(response.user));
-            console.log("Token refreshed successfully, user:", response.user);
-          } catch (error) {
-            console.error('Token invalid or expired:', error);
-            // Clear invalid token
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user_data');
-            setUser(null);
+          // Don't try to refresh token if we're on login/register pages
+          if (location.pathname !== '/login' && location.pathname !== '/register') {
+            try {
+              // Try to refresh the token to verify it's still valid
+              const response = await authService.refreshToken();
+              setUser(response.user);
+              localStorage.setItem('user_data', JSON.stringify(response.user));
+              console.log("Token refreshed successfully, user:", response.user);
+            } catch (error) {
+              console.error('Token invalid or expired:', error);
+              // Clear invalid token
+              localStorage.removeItem('auth_token');
+              localStorage.removeItem('user_data');
+              setUser(null);
+            }
           }
+        } else {
+          console.log("No authentication token found");
         }
       } catch (error) {
         console.error('Auth check failed:', error);
+        // Clear any potentially corrupted state
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
     
     checkAuth();
-  }, []);
+  }, [location.pathname]);
   
   // Login handler
   const login = async (email: string, password: string): Promise<AuthResponse | undefined> => {
@@ -81,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Login failed:', error);
       toast({
         title: "Login failed",
-        description: "Please check your credentials and try again",
+        description: error instanceof Error ? error.message : "Please check your credentials and try again",
         variant: "destructive",
       });
       return undefined;
@@ -120,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Registration failed:', error);
       toast({
         title: "Registration failed",
-        description: "Please check your information and try again",
+        description: error instanceof Error ? error.message : "Please check your information and try again",
         variant: "destructive",
       });
       return undefined;
@@ -147,6 +158,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         description: "An error occurred while logging out",
         variant: "destructive",
       });
+      // Force logout even if API call fails
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+      setUser(null);
+      navigate('/login');
     } finally {
       setIsLoading(false);
     }

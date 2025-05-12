@@ -32,6 +32,10 @@ export const authService = {
       const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.login, credentials);
       console.log("Login response:", response);
       
+      if (!response || !response.token || !response.user) {
+        throw new Error("Invalid response from server");
+      }
+      
       // Store token in localStorage
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user_data', JSON.stringify(response.user));
@@ -47,6 +51,10 @@ export const authService = {
     try {
       const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.register, userData);
       console.log("Registration response:", response);
+      
+      if (!response || !response.token || !response.user) {
+        throw new Error("Invalid response from server");
+      }
       
       // Store token in localStorage
       localStorage.setItem('auth_token', response.token);
@@ -76,6 +84,11 @@ export const authService = {
   async refreshToken(): Promise<AuthResponse> {
     try {
       const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.refresh, {});
+      
+      if (!response || !response.token || !response.user) {
+        throw new Error("Invalid response from server");
+      }
+      
       // Update token in localStorage
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user_data', JSON.stringify(response.user));
@@ -101,7 +114,12 @@ export const authService = {
 
   // Get current user
   getCurrentUser(): User | null {
-    const userData = localStorage.getItem('user_data');
-    return userData ? JSON.parse(userData) : null;
+    try {
+      const userData = localStorage.getItem('user_data');
+      return userData ? JSON.parse(userData) : null;
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      return null;
+    }
   }
 };
