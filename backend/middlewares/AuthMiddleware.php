@@ -49,3 +49,4 @@ class AuthMiddleware {
         }
     }
 }
+$Authmiddleware = new Authmiddleware();

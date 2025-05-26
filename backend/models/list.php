@@ -38,7 +38,9 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
             )";
             
             $this->conn->exec($sql);
+            
         }
+        echo "script executed succefully.";
     }
     
     public function findById($id) {
@@ -112,3 +114,4 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
         return $stmt->execute();
     }
 }
+$listmodel = new listmodel();

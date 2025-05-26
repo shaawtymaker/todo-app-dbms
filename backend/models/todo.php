@@ -41,6 +41,7 @@ class Todo {
             
             $this->conn->exec($sql);
         }
+        echo "script executed succefully.";
     }
     
     public function findById($id) {
@@ -117,3 +118,4 @@ class Todo {
         return $stmt->execute();
     }
 }
+$Todo = new todo();
