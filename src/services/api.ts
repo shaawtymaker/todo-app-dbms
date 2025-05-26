@@ -6,58 +6,55 @@ const getToken = (): string | null => localStorage.getItem('auth_token');
 
 // Handle API responses
 const handleResponse = async <T>(response: Response): Promise<T> => {
+  console.log('API Response Status:', response.status);
+  console.log('API Response Headers:', Object.fromEntries(response.headers.entries()));
+  
   if (!response.ok) {
-    // First try to get the response body as text
     let responseText;
     try {
       responseText = await response.text();
+      console.log('Error response body:', responseText);
     } catch (e) {
-      throw new Error(`API Error: ${response.status}`);
+      throw new Error(`API Error: ${response.status} - ${response.statusText}`);
     }
     
-    // Log full response for debugging
-    console.log('API Error Response:', response.status, response.statusText);
-    console.log('Response text:', responseText);
+    // Check if we're getting HTML instead of JSON (backend not reachable)
+    if (responseText.includes('<!DOCTYPE html>')) {
+      throw new Error('Backend API not reachable. Please check your backend server is running.');
+    }
     
-    // Try to parse JSON if possible
+    // Try to parse JSON error
     let errorData;
     try {
-      // Some errors might output text before JSON, try to extract JSON
-      const jsonMatch = responseText.match(/{.*}/s);
-      if (jsonMatch) {
-        errorData = JSON.parse(jsonMatch[0]);
-      } else {
-        errorData = { message: responseText || `API Error: ${response.status}` };
-      }
+      errorData = JSON.parse(responseText);
     } catch (e) {
       errorData = { message: responseText || `API Error: ${response.status}` };
     }
     
-    console.log('Parsed error data:', errorData);
     throw new Error(errorData.message || `API Error: ${response.status}`);
   }
   
   // Handle empty responses safely
   try {
     const responseText = await response.text();
+    console.log('Success response body:', responseText);
     
     // Handle empty responses
     if (!responseText || !responseText.trim()) {
-      console.log('Empty response received');
       return {} as T;
+    }
+    
+    // Check if we're getting HTML instead of JSON (backend not reachable)
+    if (responseText.includes('<!DOCTYPE html>')) {
+      throw new Error('Backend API not reachable. Please check your backend server is running.');
     }
     
     // Try to parse the response as JSON
     try {
-      // Some responses might output text before JSON, try to extract JSON
-      const jsonMatch = responseText.match(/{.*}/s) || responseText.match(/\[.*\]/s);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
       return JSON.parse(responseText) as T;
     } catch (e) {
       console.error('Error parsing JSON response:', e);
-      return responseText as unknown as T;
+      throw new Error('Invalid JSON response from server');
     }
   } catch (error) {
     console.error('Error reading response body:', error);
@@ -78,14 +75,14 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
 
-    // Log the request for debugging
-    console.log(`Request: ${API_BASE_URL}${endpoint}`, {
+    const fullUrl = `${API_BASE_URL}${endpoint}`;
+    console.log(`Making request to: ${fullUrl}`, {
       method: options.method || 'GET',
       headers: defaultHeaders,
       body: options.body ? JSON.parse(options.body as string) : undefined
     });
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(fullUrl, {
       ...options,
       headers: {
         ...defaultHeaders,

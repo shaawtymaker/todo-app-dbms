@@ -29,8 +29,9 @@ export const authService = {
   // Login user
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
+      console.log("Attempting login with credentials:", { email: credentials.email });
       const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.login, credentials);
-      console.log("Login response:", response);
+      console.log("Login response received:", response);
       
       // Validate the response structure
       if (!response || typeof response !== 'object') {
@@ -53,6 +54,7 @@ export const authService = {
       // Store token in localStorage
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user_data', JSON.stringify(response.user));
+      console.log("Login successful, token and user data stored");
       return response;
     } catch (error) {
       console.error("Login error:", error);
@@ -63,8 +65,12 @@ export const authService = {
   // Register user
   async register(userData: RegisterData): Promise<AuthResponse> {
     try {
+      console.log("Attempting registration with data:", { 
+        name: userData.name, 
+        email: userData.email 
+      });
       const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.auth.register, userData);
-      console.log("Registration response:", response);
+      console.log("Registration response received:", response);
       
       // Validate the response structure
       if (!response || typeof response !== 'object') {
@@ -87,6 +93,7 @@ export const authService = {
       // Store token in localStorage
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user_data', JSON.stringify(response.user));
+      console.log("Registration successful, token and user data stored");
       return response;
     } catch (error) {
       console.error("Registration error:", error);
