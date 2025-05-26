@@ -18,3 +18,16 @@ console.log('API configuration loaded:', {
   API_BASE_URL,
   endpoints: API_ENDPOINTS
 });
+
+// Validate that backend is reachable
+export const validateBackend = async (): Promise<boolean> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'OPTIONS',
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('Backend not reachable:', error);
+    return false;
+  }
+};

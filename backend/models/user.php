@@ -23,7 +23,6 @@ class User {
         )";
         
         $this->conn->exec($sql);
-        echo "yess";
     }
     
     public function findById($id) {
@@ -70,5 +69,3 @@ class User {
         return false;
     }
 }
-$user = new User();
-

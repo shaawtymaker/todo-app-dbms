@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/../utils/jwt_util.php';
 require_once __DIR__ . '/../models/user.php';
@@ -20,40 +19,45 @@ class AuthController {
             return;
         }
         
-        // Get request data
-        $data = json_decode(file_get_contents('php://input'), true);
-        
-        // Validate data
-        if (!isset($data['email']) || !isset($data['password'])) {
-            http_response_code(400);
-            echo json_encode(['message' => 'Email and password are required']);
-            return;
+        try {
+            // Get request data
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            // Validate data
+            if (!isset($data['email']) || !isset($data['password'])) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Email and password are required']);
+                return;
+            }
+            
+            // Attempt to authenticate user
+            $user = $this->user_model->findByEmail($data['email']);
+            
+            if (!$user || !password_verify($data['password'], $user['password'])) {
+                http_response_code(401);
+                echo json_encode(['message' => 'Invalid credentials']);
+                return;
+            }
+            
+            // Generate JWT token with longer expiration
+            $token = $this->jwt_util->generateToken([
+                'id' => $user['id'],
+                'name' => $user['name'],
+                'email' => $user['email']
+            ], 30 * 24 * 60 * 60); // 30 days expiration
+            
+            // Remove password from response
+            unset($user['password']);
+            
+            // Return user and token
+            echo json_encode([
+                'user' => $user,
+                'token' => $token
+            ]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'Internal server error: ' . $e->getMessage()]);
         }
-        
-        // Attempt to authenticate user
-        $user = $this->user_model->findByEmail($data['email']);
-        
-        if (!$user || !password_verify($data['password'], $user['password'])) {
-            http_response_code(401);
-            echo json_encode(['message' => 'Invalid credentials']);
-            return;
-        }
-        
-        // Generate JWT token with longer expiration
-        $token = $this->jwt_util->generateToken([
-            'id' => $user['id'],
-            'name' => $user['name'],
-            'email' => $user['email']
-        ], 30 * 24 * 60 * 60); // 30 days expiration
-        
-        // Remove password from response
-        unset($user['password']);
-        
-        // Return user and token
-        echo json_encode([
-            'user' => $user,
-            'token' => $token
-        ]);
     }
     
     public function register() {
@@ -64,54 +68,80 @@ class AuthController {
             return;
         }
         
-        // Get request data
-        $data = json_decode(file_get_contents('php://input'), true);
-        
-        // Validate data
-        if (!isset($data['name']) || !isset($data['email']) || !isset($data['password'])) {
-            http_response_code(400);
-            echo json_encode(['message' => 'Name, email and password are required']);
-            return;
-        }
-        
-        // Check if user already exists
-        if ($this->user_model->findByEmail($data['email'])) {
-            http_response_code(409);
-            echo json_encode(['message' => 'Email already in use']);
-            return;
-        }
-        
-        // Create user
-        $user_id = $this->user_model->create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => password_hash($data['password'], PASSWORD_DEFAULT)
-        ]);
-        
-        if (!$user_id) {
+        try {
+            // Get request data
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Invalid JSON data']);
+                return;
+            }
+            
+            // Validate data
+            if (!isset($data['name']) || !isset($data['email']) || !isset($data['password'])) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Name, email and password are required']);
+                return;
+            }
+            
+            // Validate email format
+            if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Invalid email format']);
+                return;
+            }
+            
+            // Check if user already exists
+            if ($this->user_model->findByEmail($data['email'])) {
+                http_response_code(409);
+                echo json_encode(['message' => 'Email already in use']);
+                return;
+            }
+            
+            // Create user
+            $user_id = $this->user_model->create([
+                'name' => trim($data['name']),
+                'email' => trim($data['email']),
+                'password' => $data['password'] // Let the model handle hashing
+            ]);
+            
+            if (!$user_id) {
+                http_response_code(500);
+                echo json_encode(['message' => 'Failed to create user']);
+                return;
+            }
+            
+            // Get created user
+            $user = $this->user_model->findById($user_id);
+            
+            if (!$user) {
+                http_response_code(500);
+                echo json_encode(['message' => 'User created but could not retrieve user data']);
+                return;
+            }
+            
+            // Generate JWT token with longer expiration
+            $token = $this->jwt_util->generateToken([
+                'id' => $user['id'],
+                'name' => $user['name'],
+                'email' => $user['email']
+            ], 30 * 24 * 60 * 60); // 30 days expiration
+            
+            // Remove password from response
+            unset($user['password']);
+            
+            // Return user and token
+            http_response_code(201);
+            echo json_encode([
+                'user' => $user,
+                'token' => $token
+            ]);
+        } catch (Exception $e) {
             http_response_code(500);
-            echo json_encode(['message' => 'Failed to create user']);
-            return;
+            echo json_encode(['message' => 'Internal server error: ' . $e->getMessage()]);
         }
-        
-        // Get created user
-        $user = $this->user_model->findById($user_id);
-        
-        // Generate JWT token with longer expiration
-        $token = $this->jwt_util->generateToken([
-            'id' => $user['id'],
-            'name' => $user['name'],
-            'email' => $user['email']
-        ], 30 * 24 * 60 * 60); // 30 days expiration
-        
-        // Remove password from response
-        unset($user['password']);
-        
-        // Return user and token
-        echo json_encode([
-            'user' => $user,
-            'token' => $token
-        ]);
     }
     
     public function logout() {
