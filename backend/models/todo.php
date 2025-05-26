@@ -41,7 +41,6 @@ class Todo {
             
             $this->conn->exec($sql);
         }
-        echo "script executed succefully.";
     }
     
     public function findById($id) {
