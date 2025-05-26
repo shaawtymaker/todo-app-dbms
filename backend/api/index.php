@@ -4,7 +4,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Allow cross-origin requests
+// Allow cross-origin requests from any origin for development
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
@@ -19,16 +19,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     // Parse request URL
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-    // Remove everything before /api/
+    
+    // Remove base path if present
+    $basePath = '/todo-app-dbms/backend/api';
+    if (strpos($uri, $basePath) === 0) {
+        $uri = substr($uri, strlen($basePath));
+    }
+    
+    // Also handle if accessed directly via /api/
     $apiPos = strpos($uri, '/api/');
     if ($apiPos !== false) {
         $uri = substr($uri, $apiPos + strlen('/api/'));
     }
 
     $uri_parts = explode('/', trim($uri, '/'));
+    
+    // Debug output
+    error_log("Request URI: " . $_SERVER['REQUEST_URI']);
+    error_log("Parsed URI: " . $uri);
+    error_log("URI parts: " . print_r($uri_parts, true));
 
-    $controller = isset($uri_parts[0]) ? $uri_parts[0] : '';
+    $controller = isset($uri_parts[0]) && $uri_parts[0] !== '' ? $uri_parts[0] : '';
     $action = isset($uri_parts[1]) ? $uri_parts[1] : '';
     $id = isset($uri_parts[2]) ? $uri_parts[2] : null;
 
@@ -66,7 +77,7 @@ try {
                     break;
                 default:
                     http_response_code(404);
-                    echo json_encode(['message' => 'Auth endpoint not found']);
+                    echo json_encode(['message' => 'Auth endpoint not found: ' . $action]);
                     break;
             }
             break;
@@ -111,6 +122,11 @@ try {
                 http_response_code(404);
                 echo json_encode(['message' => 'List endpoint not found']);
             }
+            break;
+            
+        case '':
+            // Handle root API request
+            echo json_encode(['message' => 'Todo App API', 'status' => 'running']);
             break;
             
         default:
