@@ -14,19 +14,16 @@ interface SidebarProps {
 }
 
 export function Sidebar({ onNavItemClick }: SidebarProps) {
-  const { state, dispatch } = useTodo();
+  const { state, addList } = useTodo();
   const [isNewListDialogOpen, setIsNewListDialogOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [newListColor, setNewListColor] = useState('#8b5cf6');
   const { user } = useAuth();
   const location = useLocation();
   
-  const handleCreateList = () => {
+  const handleCreateList = async () => {
     if (newListName.trim()) {
-      dispatch({
-        type: 'ADD_LIST',
-        payload: { name: newListName.trim(), color: newListColor }
-      });
+      await addList(newListName.trim(), newListColor);
       setNewListName('');
       setNewListColor('#8b5cf6');
       setIsNewListDialogOpen(false);

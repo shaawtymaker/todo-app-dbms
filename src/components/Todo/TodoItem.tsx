@@ -12,24 +12,21 @@ interface TodoItemProps {
 }
 
 export function TodoItem({ todo }: TodoItemProps) {
-  const { dispatch } = useTodo();
+  const { toggleTodo, editTodo, deleteTodo } = useTodo();
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
   
-  const handleToggle = () => {
-    dispatch({ type: 'TOGGLE_TODO', payload: todo.id });
+  const handleToggle = async () => {
+    await toggleTodo(todo.id);
   };
   
-  const handleDelete = () => {
-    dispatch({ type: 'DELETE_TODO', payload: todo.id });
+  const handleDelete = async () => {
+    await deleteTodo(todo.id);
   };
   
-  const handleEdit = () => {
+  const handleEdit = async () => {
     if (editText.trim() !== '') {
-      dispatch({
-        type: 'EDIT_TODO',
-        payload: { id: todo.id, text: editText.trim() }
-      });
+      await editTodo(todo.id, editText.trim());
       setIsEditing(false);
     }
   };
