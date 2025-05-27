@@ -9,7 +9,7 @@ class ListController {
     private $default_lists;
     
     public function __construct() {
-        $this->list_model = new ListModel(); // Using ListModel to avoid conflict with PHP's List keyword
+        $this->list_model = new ListModel();
         $this->auth_middleware = new AuthMiddleware();
         
         // Define default lists
@@ -50,6 +50,7 @@ class ListController {
             }
         }
         
+        header('Content-Type: application/json');
         echo json_encode($lists);
     }
     
@@ -72,6 +73,7 @@ class ListController {
                 $this->list_model->create($default_list);
             }
             
+            header('Content-Type: application/json');
             echo json_encode($default_list);
             return;
         }
@@ -81,10 +83,12 @@ class ListController {
         
         if (!$list || $list['user_id'] != $user['id']) {
             http_response_code(404);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'List not found']);
             return;
         }
         
+        header('Content-Type: application/json');
         echo json_encode($list);
     }
     
@@ -100,6 +104,7 @@ class ListController {
         // Validate data
         if (!isset($data['name']) || !isset($data['color'])) {
             http_response_code(400);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Name and color are required']);
             return;
         }
@@ -112,6 +117,7 @@ class ListController {
         
         if (!$list_id) {
             http_response_code(500);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Failed to create list']);
             return;
         }
@@ -119,6 +125,7 @@ class ListController {
         // Get created list
         $list = $this->list_model->findById($list_id);
         
+        header('Content-Type: application/json');
         echo json_encode($list);
     }
     
@@ -131,6 +138,7 @@ class ListController {
         // Check if it's a default list
         if ($this->isDefaultList($id)) {
             http_response_code(403);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Default lists cannot be updated']);
             return;
         }
@@ -140,6 +148,7 @@ class ListController {
         
         if (!$list || $list['user_id'] != $user['id']) {
             http_response_code(404);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'List not found']);
             return;
         }
@@ -152,6 +161,7 @@ class ListController {
         
         if (!$success) {
             http_response_code(500);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Failed to update list']);
             return;
         }
@@ -159,6 +169,7 @@ class ListController {
         // Get updated list
         $list = $this->list_model->findById($id);
         
+        header('Content-Type: application/json');
         echo json_encode($list);
     }
     
@@ -171,6 +182,7 @@ class ListController {
         // Check if it's a default list
         if ($this->isDefaultList($id)) {
             http_response_code(403);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Default lists cannot be deleted']);
             return;
         }
@@ -180,6 +192,7 @@ class ListController {
         
         if (!$list || $list['user_id'] != $user['id']) {
             http_response_code(404);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'List not found']);
             return;
         }
@@ -189,10 +202,12 @@ class ListController {
         
         if (!$success) {
             http_response_code(500);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Failed to delete list']);
             return;
         }
         
+        header('Content-Type: application/json');
         echo json_encode(['message' => 'List deleted successfully']);
     }
     

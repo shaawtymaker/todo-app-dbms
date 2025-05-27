@@ -2,7 +2,7 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 
-class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
+class ListModel {
     private $conn;
     
     public function __construct() {
@@ -51,7 +51,7 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
     }
     
     public function findByUser($user_id) {
-        $sql = "SELECT * FROM lists WHERE user_id = :user_id";
+        $sql = "SELECT * FROM lists WHERE user_id = :user_id ORDER BY created_at ASC";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':user_id', $user_id);
         $stmt->execute();
@@ -64,20 +64,16 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
         $id = isset($data['id']) ? $data['id'] : uniqid();
         
         $sql = "INSERT INTO lists (id, name, color, user_id) 
-                VALUES (:id, :name, :color, :user_id)";
+                VALUES (:id, :name, :color, :user_id)
+                ON DUPLICATE KEY UPDATE 
+                name = VALUES(name), 
+                color = VALUES(color)";
                 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':color', $data['color']);
         $stmt->bindParam(':user_id', $data['user_id']);
-        
-        // Check if list with this ID already exists
-        $existingList = $this->findById($id);
-        if ($existingList) {
-            // List already exists, return the ID
-            return $id;
-        }
         
         if ($stmt->execute()) {
             return $id;
@@ -112,4 +108,3 @@ class ListModel { // Using ListModel to avoid conflict with PHP's List keyword
         return $stmt->execute();
     }
 }
-$listmodel = new listmodel();

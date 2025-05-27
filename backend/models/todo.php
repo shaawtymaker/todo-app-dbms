@@ -97,7 +97,11 @@ class Todo {
         
         foreach ($data as $key => $value) {
             $sql .= "$key = :$key, ";
-            $params[":$key"] = $value;
+            if ($key === 'completed') {
+                $params[":$key"] = (bool)$value;
+            } else {
+                $params[":$key"] = $value;
+            }
         }
         
         $sql = rtrim($sql, ", ");
@@ -106,7 +110,16 @@ class Todo {
         
         $stmt = $this->conn->prepare($sql);
         
-        return $stmt->execute($params);
+        // Bind boolean parameters correctly
+        foreach ($params as $param => $value) {
+            if ($param === ':completed') {
+                $stmt->bindParam($param, $value, PDO::PARAM_BOOL);
+            } else {
+                $stmt->bindParam($param, $value);
+            }
+        }
+        
+        return $stmt->execute();
     }
     
     public function delete($id) {
@@ -117,4 +130,3 @@ class Todo {
         return $stmt->execute();
     }
 }
-$Todo = new todo();

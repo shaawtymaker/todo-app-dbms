@@ -26,6 +26,12 @@ class TodoController {
             $todos = $this->todo_model->findByUser($user['id']);
         }
         
+        // Convert completed field to boolean for consistency
+        foreach ($todos as &$todo) {
+            $todo['completed'] = (bool)$todo['completed'];
+        }
+        
+        header('Content-Type: application/json');
         echo json_encode($todos);
     }
     
@@ -37,10 +43,15 @@ class TodoController {
         
         if (!$todo || $todo['user_id'] != $user['id']) {
             http_response_code(404);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Todo not found']);
             return;
         }
         
+        // Convert completed field to boolean
+        $todo['completed'] = (bool)$todo['completed'];
+        
+        header('Content-Type: application/json');
         echo json_encode($todo);
     }
     
@@ -53,6 +64,7 @@ class TodoController {
         // Validate data
         if (!isset($data['text']) || !isset($data['list_id'])) {
             http_response_code(400);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Text and list_id are required']);
             return;
         }
@@ -66,24 +78,28 @@ class TodoController {
         
         if (!$todo_id) {
             http_response_code(500);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Failed to create todo']);
             return;
         }
         
         // Get created todo
         $todo = $this->todo_model->findById($todo_id);
+        $todo['completed'] = (bool)$todo['completed'];
         
+        header('Content-Type: application/json');
         echo json_encode($todo);
     }
     
     public function update($id) {
         $user = $this->auth_middleware->authenticate();
         
-        // Get todo
+        // Get todo first to verify ownership
         $todo = $this->todo_model->findById($id);
         
         if (!$todo || $todo['user_id'] != $user['id']) {
             http_response_code(404);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Todo not found']);
             return;
         }
@@ -96,53 +112,62 @@ class TodoController {
         
         if (!$success) {
             http_response_code(500);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Failed to update todo']);
             return;
         }
         
         // Get updated todo
-        $todo = $this->todo_model->findById($id);
+        $updated_todo = $this->todo_model->findById($id);
+        $updated_todo['completed'] = (bool)$updated_todo['completed'];
         
-        echo json_encode($todo);
+        header('Content-Type: application/json');
+        echo json_encode($updated_todo);
     }
     
     public function toggle($id) {
         $user = $this->auth_middleware->authenticate();
         
-        // Get todo
+        // Get todo first to verify ownership
         $todo = $this->todo_model->findById($id);
         
         if (!$todo || $todo['user_id'] != $user['id']) {
             http_response_code(404);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Todo not found']);
             return;
         }
         
         // Toggle completed status
+        $new_completed = !$todo['completed'];
         $success = $this->todo_model->update($id, [
-            'completed' => !$todo['completed']
+            'completed' => $new_completed
         ]);
         
         if (!$success) {
             http_response_code(500);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Failed to toggle todo']);
             return;
         }
         
         // Get updated todo
-        $todo = $this->todo_model->findById($id);
+        $updated_todo = $this->todo_model->findById($id);
+        $updated_todo['completed'] = (bool)$updated_todo['completed'];
         
-        echo json_encode($todo);
+        header('Content-Type: application/json');
+        echo json_encode($updated_todo);
     }
     
     public function delete($id) {
         $user = $this->auth_middleware->authenticate();
         
-        // Get todo
+        // Get todo first to verify ownership
         $todo = $this->todo_model->findById($id);
         
         if (!$todo || $todo['user_id'] != $user['id']) {
             http_response_code(404);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Todo not found']);
             return;
         }
@@ -152,10 +177,12 @@ class TodoController {
         
         if (!$success) {
             http_response_code(500);
+            header('Content-Type: application/json');
             echo json_encode(['message' => 'Failed to delete todo']);
             return;
         }
         
+        header('Content-Type: application/json');
         echo json_encode(['message' => 'Todo deleted successfully']);
     }
 }
