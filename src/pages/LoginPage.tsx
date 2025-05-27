@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { InteractiveBackground } from "@/components/Background";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -58,12 +59,13 @@ export default function LoginPage() {
   };
   
   return (
-    <div className="flex flex-col min-h-screen bg-background p-4">
-      <div className="flex justify-end p-4">
+    <div className="relative flex flex-col min-h-screen bg-background p-4">
+      <InteractiveBackground />
+      <div className="relative z-10 flex justify-end p-4">
         <ThemeToggle />
       </div>
-      <div className="flex items-center justify-center flex-1">
-        <Card className="w-full max-w-md">
+      <div className="relative z-10 flex items-center justify-center flex-1">
+        <Card className="w-full max-w-md backdrop-blur-lg bg-card/90 border-primary/20">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
           </CardHeader>
