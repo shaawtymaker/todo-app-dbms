@@ -35,32 +35,32 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="px-2 py-1">
+          <Badge variant="outline" className="px-2 py-1 backdrop-blur-sm bg-background/80">
             {new Date().toLocaleDateString()}
           </Badge>
         </div>
       </div>
 
       {/* Welcome card */}
-      <Card className="animate-scale-in" style={{animationDelay: '0.1s'}}>
+      <Card className="animate-scale-in backdrop-blur-lg bg-card/90 border-primary/20" style={{animationDelay: '0.1s'}}>
         <CardHeader>
           <CardTitle>Welcome back, {user?.name || 'User'}!</CardTitle>
           <CardDescription>Here's an overview of your tasks</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex flex-col items-center justify-center p-4 bg-primary/5 rounded-lg">
+            <div className="flex flex-col items-center justify-center p-4 bg-primary/10 backdrop-blur-sm rounded-lg border border-primary/20">
               <ListTodo className="h-8 w-8 mb-2 text-primary" />
               <span className="text-2xl font-bold">{totalTasks}</span>
               <span className="text-sm text-muted-foreground">Total Tasks</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-green-500/5 rounded-lg">
+            <div className="flex flex-col items-center justify-center p-4 bg-success/10 backdrop-blur-sm rounded-lg border border-success/20">
               <CheckCircle className="h-8 w-8 mb-2 text-success" />
               <span className="text-2xl font-bold">{completedTasks}</span>
               <span className="text-sm text-muted-foreground">Completed Tasks</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-amber-500/5 rounded-lg">
-              <Clock className="h-8 w-8 mb-2 text-amber-500" />
+            <div className="flex flex-col items-center justify-center p-4 bg-warning/10 backdrop-blur-sm rounded-lg border border-warning/20">
+              <Clock className="h-8 w-8 mb-2 text-warning" />
               <span className="text-2xl font-bold">{pendingTasks}</span>
               <span className="text-sm text-muted-foreground">Pending Tasks</span>
             </div>
@@ -70,7 +70,7 @@ export default function DashboardPage() {
 
       {/* Progress card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="animate-scale-in" style={{animationDelay: '0.2s'}}>
+        <Card className="animate-scale-in backdrop-blur-lg bg-card/90 border-primary/20" style={{animationDelay: '0.2s'}}>
           <CardHeader>
             <CardTitle>Completion Progress</CardTitle>
             <CardDescription>Your task completion rate</CardDescription>
@@ -101,7 +101,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="animate-scale-in" style={{animationDelay: '0.3s'}}>
+        <Card className="animate-scale-in backdrop-blur-lg bg-card/90 border-primary/20" style={{animationDelay: '0.3s'}}>
           <CardHeader>
             <CardTitle>Task Distribution</CardTitle>
             <CardDescription>Your tasks by status</CardDescription>
@@ -140,7 +140,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Lists Overview */}
-      <Card className="animate-scale-in" style={{animationDelay: '0.4s'}}>
+      <Card className="animate-scale-in backdrop-blur-lg bg-card/90 border-primary/20" style={{animationDelay: '0.4s'}}>
         <CardHeader>
           <CardTitle>Lists Overview</CardTitle>
           <CardDescription>Status of tasks in each list</CardDescription>
@@ -161,13 +161,13 @@ export default function DashboardPage() {
                   : 0;
 
                 return (
-                  <div key={list.id} className="border rounded-lg p-4">
+                  <div key={list.id} className="border rounded-lg p-4 backdrop-blur-sm bg-background/50 border-primary/20">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full" style={{ backgroundColor: list.color }}></span>
                         <span className="font-medium">{list.name}</span>
                       </div>
-                      <Badge variant="outline">
+                      <Badge variant="outline" className="backdrop-blur-sm bg-background/80">
                         {listTodos.length} {listTodos.length === 1 ? 'task' : 'tasks'}
                       </Badge>
                     </div>
