@@ -3,6 +3,7 @@
 ## Project info
 
 **URL**: https://todo-app-dbms.lovable.app/
+**URL**: https://todo-app-dbms.vercel.app/
 
 **Use your preferred IDE**
 
