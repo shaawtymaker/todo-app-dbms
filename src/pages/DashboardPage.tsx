@@ -3,7 +3,7 @@ import React from 'react';
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from '@/components/ui/progress';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useTodo } from '@/contexts/TodoContext';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, ListChecks, ListTodo, Clock } from 'lucide-react';
@@ -107,26 +107,42 @@ export default function DashboardPage() {
             <CardDescription>Your tasks by status</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[200px]">
+            <div className="h-[280px]">
               {totalTasks > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={data}
                       cx="50%"
-                      cy="50%"
-                      innerRadius={60}
+                      cy="45%"
+                      innerRadius={50}
                       outerRadius={80}
                       fill="#8884d8"
                       paddingAngle={5}
                       dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                     >
                       {data.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [`${value} tasks`, '']} />
+                    <Tooltip 
+                      formatter={(value, name) => [`${value} tasks`, name]}
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36}
+                      formatter={(value, entry) => (
+                        <span style={{ color: entry.color, fontSize: '14px' }}>
+                          {value}: {entry.payload.value} tasks
+                        </span>
+                      )}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
