@@ -107,6 +107,13 @@ class TodoController {
         // Get request data
         $data = json_decode(file_get_contents('php://input'), true);
         
+        if (!$data) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['message' => 'Invalid JSON data']);
+            return;
+        }
+        
         // Update todo
         $success = $this->todo_model->update($id, $data);
         
@@ -139,7 +146,7 @@ class TodoController {
         }
         
         // Toggle completed status
-        $new_completed = !$todo['completed'];
+        $new_completed = !((bool)$todo['completed']);
         $success = $this->todo_model->update($id, [
             'completed' => $new_completed
         ]);

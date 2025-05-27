@@ -38,10 +38,11 @@ try {
     error_log("Request URI: " . $_SERVER['REQUEST_URI']);
     error_log("Parsed URI: " . $uri);
     error_log("URI parts: " . print_r($uri_parts, true));
+    error_log("Request method: " . $_SERVER['REQUEST_METHOD']);
 
     $controller = isset($uri_parts[0]) && $uri_parts[0] !== '' ? $uri_parts[0] : '';
-    $action = isset($uri_parts[1]) ? $uri_parts[1] : '';
-    $id = isset($uri_parts[2]) ? $uri_parts[2] : null;
+    $id = isset($uri_parts[1]) ? $uri_parts[1] : null;
+    $action = isset($uri_parts[2]) ? $uri_parts[2] : '';
 
     // Get Authorization header via getallheaders() if available
     if (!isset($_SERVER['HTTP_AUTHORIZATION'])) {
@@ -62,7 +63,7 @@ try {
             require __DIR__ . '/../controllers/auth_controller.php';
             $auth_controller = new AuthController();
             
-            switch ($action) {
+            switch ($id) {
                 case 'login':
                     $auth_controller->login();
                     break;
@@ -77,7 +78,7 @@ try {
                     break;
                 default:
                     http_response_code(404);
-                    echo json_encode(['message' => 'Auth endpoint not found: ' . $action]);
+                    echo json_encode(['message' => 'Auth endpoint not found: ' . $id]);
                     break;
             }
             break;
@@ -92,7 +93,7 @@ try {
                 $todo_controller->getById($id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$id) {
                 $todo_controller->create();
-            } else if ($_SERVER['REQUEST_METHOD'] === 'PUT' && $action === 'toggle') {
+            } else if ($_SERVER['REQUEST_METHOD'] === 'PUT' && $id && $action === 'toggle') {
                 $todo_controller->toggle($id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'PUT' && $id) {
                 $todo_controller->update($id);

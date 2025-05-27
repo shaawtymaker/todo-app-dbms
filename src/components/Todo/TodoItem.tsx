@@ -17,17 +17,35 @@ export function TodoItem({ todo }: TodoItemProps) {
   const [editText, setEditText] = useState(todo.text);
   
   const handleToggle = async () => {
-    await toggleTodo(todo.id);
+    console.log('Toggling todo:', todo.id);
+    try {
+      await toggleTodo(todo.id);
+      console.log('Toggle successful for todo:', todo.id);
+    } catch (error) {
+      console.error('Toggle failed for todo:', todo.id, error);
+    }
   };
   
   const handleDelete = async () => {
-    await deleteTodo(todo.id);
+    console.log('Deleting todo:', todo.id);
+    try {
+      await deleteTodo(todo.id);
+      console.log('Delete successful for todo:', todo.id);
+    } catch (error) {
+      console.error('Delete failed for todo:', todo.id, error);
+    }
   };
   
   const handleEdit = async () => {
     if (editText.trim() !== '') {
-      await editTodo(todo.id, editText.trim());
-      setIsEditing(false);
+      console.log('Editing todo:', todo.id, 'new text:', editText.trim());
+      try {
+        await editTodo(todo.id, editText.trim());
+        console.log('Edit successful for todo:', todo.id);
+        setIsEditing(false);
+      } catch (error) {
+        console.error('Edit failed for todo:', todo.id, error);
+      }
     }
   };
   

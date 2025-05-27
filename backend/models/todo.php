@@ -93,29 +93,25 @@ class Todo {
     
     public function update($id, $data) {
         $sql = "UPDATE todos SET ";
-        $params = [];
+        $updateParts = [];
+        $params = [':id' => $id];
         
         foreach ($data as $key => $value) {
-            $sql .= "$key = :$key, ";
-            if ($key === 'completed') {
-                $params[":$key"] = (bool)$value;
-            } else {
-                $params[":$key"] = $value;
-            }
+            $updateParts[] = "$key = :$key";
+            $params[":$key"] = $value;
         }
         
-        $sql = rtrim($sql, ", ");
+        $sql .= implode(', ', $updateParts);
         $sql .= " WHERE id = :id";
-        $params[':id'] = $id;
         
         $stmt = $this->conn->prepare($sql);
         
-        // Bind boolean parameters correctly
+        // Bind parameters with correct types
         foreach ($params as $param => $value) {
             if ($param === ':completed') {
-                $stmt->bindParam($param, $value, PDO::PARAM_BOOL);
+                $stmt->bindValue($param, (bool)$value, PDO::PARAM_BOOL);
             } else {
-                $stmt->bindParam($param, $value);
+                $stmt->bindValue($param, $value);
             }
         }
         
