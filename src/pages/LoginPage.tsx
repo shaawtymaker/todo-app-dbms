@@ -64,14 +64,14 @@ export default function LoginPage() {
         <ThemeToggle />
       </div>
       <div className="relative z-10 flex items-center justify-center flex-1">
-        <Card className="w-full max-w-md backdrop-blur-md bg-transparent border-white/20">
+        <Card className="w-full max-w-md backdrop-blur-sm bg-black/40 border-white/30 shadow-2xl">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold text-white">Welcome back</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white drop-shadow-lg">Welcome back</CardTitle>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Email</Label>
+                <Label htmlFor="email" className="text-white font-medium drop-shadow">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -79,15 +79,15 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/70"
+                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-white">Password</Label>
+                  <Label htmlFor="password" className="text-white font-medium drop-shadow">Password</Label>
                   <Link 
                     to="/forgot-password" 
-                    className="text-sm text-white/80 hover:text-white hover:underline"
+                    className="text-sm text-white/90 hover:text-white hover:underline drop-shadow"
                   >
                     Forgot password?
                   </Link>
@@ -98,22 +98,22 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/70"
+                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full bg-white/20 hover:bg-white/30 text-white border-white/20" 
+                className="w-full bg-white/25 hover:bg-white/35 text-white border-white/40 backdrop-blur-sm font-medium shadow-lg" 
                 disabled={isSubmitting || isLoading}
                 variant="outline"
               >
                 {isSubmitting ? "Logging in..." : "Log in"}
               </Button>
-              <div className="text-center text-sm text-white/80">
+              <div className="text-center text-sm text-white/90 drop-shadow">
                 Don't have an account?{" "}
-                <Link to="/register" className="text-white hover:underline">
+                <Link to="/register" className="text-white hover:underline font-medium">
                   Sign up
                 </Link>
               </div>
