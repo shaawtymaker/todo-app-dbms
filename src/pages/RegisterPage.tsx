@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -67,24 +66,25 @@ export default function RegisterPage() {
         <ThemeToggle />
       </div>
       <div className="relative z-10 flex items-center justify-center flex-1">
-        <Card className="w-full max-w-md animate-slide-up backdrop-blur-lg bg-card/90 border-primary/20">
+        <Card className="w-full max-w-md animate-slide-up backdrop-blur-sm bg-black/40 border-white/30 shadow-2xl">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white drop-shadow-lg">Create an account</CardTitle>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name" className="text-white font-medium drop-shadow">Name</Label>
                 <Input
                   id="name"
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-white font-medium drop-shadow">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -92,40 +92,44 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-white font-medium drop-shadow">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="passwordConfirmation">Confirm Password</Label>
+                <Label htmlFor="passwordConfirmation" className="text-white font-medium drop-shadow">Confirm Password</Label>
                 <Input
                   id="passwordConfirmation"
                   type="password"
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
                   required
+                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full bg-white/25 hover:bg-white/35 text-white border-white/40 backdrop-blur-sm font-medium shadow-lg" 
                 disabled={isSubmitting}
+                variant="outline"
               >
                 {isSubmitting ? "Creating account..." : "Sign up"}
               </Button>
-              <div className="text-center text-sm">
+              <div className="text-center text-sm text-white/90 drop-shadow">
                 Already have an account?{" "}
-                <Link to="/login" className="text-primary hover:underline">
+                <Link to="/login" className="text-white hover:underline font-medium">
                   Log in
                 </Link>
               </div>

@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> b7fcf0ff7a087704982f7f82af65c82a3312fcd1
 import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
 

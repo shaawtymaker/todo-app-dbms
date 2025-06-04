@@ -51,7 +51,7 @@ export default function AppLayout() {
   };
   
   return (
-    <div className="flex min-h-screen relative">
+    <div className="flex min-h-screen relative overflow-hidden">
       {/* Interactive Background */}
       <InteractiveBackground />
       
