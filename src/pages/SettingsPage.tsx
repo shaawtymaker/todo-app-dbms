@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useTodo } from "@/contexts/todo";
@@ -50,7 +51,7 @@ export default function SettingsPage() {
     <div className="space-y-8 animate-slide-in">
       <h1 className="text-2xl font-bold">Settings</h1>
       
-      <Card>
+      <Card className="backdrop-blur-sm bg-card/20 border-primary/10">
         <CardHeader>
           <CardTitle>Appearance</CardTitle>
         </CardHeader>
@@ -69,7 +70,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="backdrop-blur-sm bg-card/20 border-primary/10">
         <CardHeader>
           <CardTitle>Lists</CardTitle>
         </CardHeader>
@@ -108,7 +109,7 @@ export default function SettingsPage() {
           ))}
           
           {lists.length === 1 && (
-            <Alert>
+            <Alert className="backdrop-blur-sm bg-card/20 border-primary/10">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 The Inbox list cannot be deleted or edited.
@@ -119,7 +120,7 @@ export default function SettingsPage() {
       </Card>
       
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="backdrop-blur-sm bg-card/90 border-primary/10">
           <DialogHeader>
             <DialogTitle>Edit List</DialogTitle>
           </DialogHeader>
@@ -131,6 +132,7 @@ export default function SettingsPage() {
                 value={editingList?.name || ''}
                 onChange={(e) => setEditingList(prev => prev ? {...prev, name: e.target.value} : null)}
                 placeholder="List name"
+                className="backdrop-blur-sm bg-background/50 border-primary/20"
               />
             </div>
             <div className="space-y-2">

@@ -11,17 +11,19 @@ export default function DashboardPage() {
   const stats = useDashboardStats();
 
   return (
-    <div className="space-y-6 animate-slide-in">
+    <div className="space-y-6 animate-slide-in relative">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="px-2 py-1 backdrop-blur-sm bg-background/80">
+          <Badge variant="outline" className="px-2 py-1 backdrop-blur-sm bg-background/80 border-primary/20">
             {new Date().toLocaleDateString()}
           </Badge>
         </div>
       </div>
 
-      <WelcomeCard stats={stats} />
+      <div className="grid grid-cols-1 gap-6">
+        <WelcomeCard stats={stats} />
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ProgressCard stats={stats} />
