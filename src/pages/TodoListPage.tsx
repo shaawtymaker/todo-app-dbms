@@ -43,11 +43,11 @@ export default function TodoListPage() {
   
   return (
     <div className="space-y-6 animate-slide-in">
-      <Card className="p-6 mb-6 animate-scale-in backdrop-blur-lg bg-card/90 border-primary/20">
+      <Card className="p-6 mb-6 animate-scale-in backdrop-blur-sm bg-card/20 border-primary/10">
         <TodoProgress listId={list.id} />
       </Card>
       
-      <div className="backdrop-blur-lg bg-card/90 border border-primary/20 rounded-lg">
+      <div className="backdrop-blur-sm bg-card/20 border border-primary/10 rounded-lg">
         <TodoListView 
           listId={list.id} 
           title={list.name} 

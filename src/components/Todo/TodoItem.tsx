@@ -61,8 +61,8 @@ export function TodoItem({ todo }: TodoItemProps) {
   return (
     <div 
       className={cn(
-        "group flex items-center gap-3 p-3 border rounded-lg transition-all duration-200 stagger-item todo-item-enter",
-        todo.completed ? "bg-muted/50" : "bg-card hover:bg-accent/5"
+        "group flex items-center gap-3 p-3 border rounded-lg transition-all duration-200 stagger-item todo-item-enter backdrop-blur-sm border-primary/10",
+        todo.completed ? "bg-muted/30" : "bg-card/20 hover:bg-accent/10"
       )}
     >
       <div className="relative touch-target flex items-center justify-center">
@@ -88,7 +88,7 @@ export function TodoItem({ todo }: TodoItemProps) {
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 border-accent focus-visible:ring-accent"
+            className="flex-1 border-accent focus-visible:ring-accent backdrop-blur-sm bg-background/50 border-primary/20"
             autoFocus
           />
           <Button 
@@ -96,7 +96,7 @@ export function TodoItem({ todo }: TodoItemProps) {
             size="icon" 
             onClick={handleEdit} 
             title="Save"
-            className="hover:bg-success/10 hover:text-success"
+            className="hover:bg-success/10 hover:text-success backdrop-blur-sm"
           >
             <Check size={18} />
           </Button>
@@ -105,7 +105,7 @@ export function TodoItem({ todo }: TodoItemProps) {
             size="icon" 
             onClick={() => { setEditText(todo.text); setIsEditing(false); }}
             title="Cancel"
-            className="hover:bg-destructive/10 hover:text-destructive"
+            className="hover:bg-destructive/10 hover:text-destructive backdrop-blur-sm"
           >
             <X size={18} />
           </Button>
@@ -128,7 +128,7 @@ export function TodoItem({ todo }: TodoItemProps) {
               variant="ghost" 
               size="icon" 
               onClick={() => setIsEditing(true)} 
-              className="h-8 w-8 hover:bg-secondary/10 hover:text-secondary"
+              className="h-8 w-8 hover:bg-secondary/10 hover:text-secondary backdrop-blur-sm"
               title="Edit"
             >
               <Pencil size={16} />
@@ -137,7 +137,7 @@ export function TodoItem({ todo }: TodoItemProps) {
               variant="ghost" 
               size="icon" 
               onClick={handleDelete}
-              className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+              className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive backdrop-blur-sm"
               title="Delete"
             >
               <Trash size={16} />

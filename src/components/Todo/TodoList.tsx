@@ -1,3 +1,4 @@
+
 import { Todo, useTodo } from "@/contexts/todo";
 import { TodoItem } from "./TodoItem";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,7 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
   };
 
   return (
-    <div className="space-y-6 animate-slide-in">
+    <div className="space-y-6 animate-slide-in p-6">
       <div className="flex items-center gap-3 mb-lg">
         <div 
           className="w-5 h-5 rounded-full" 
@@ -65,12 +66,12 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
           value={newTodoText}
           onChange={(e) => setNewTodoText(e.target.value)}
           placeholder="Add a new task"
-          className="flex-1 transition-all focus-visible:ring-primary"
+          className="flex-1 transition-all focus-visible:ring-primary backdrop-blur-sm bg-background/50 border-primary/20"
         />
         <Button 
           type="submit" 
           disabled={!newTodoText.trim()}
-          className="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          className="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] backdrop-blur-sm bg-primary/80 hover:bg-primary/90"
         >
           <Plus size={18} className="mr-2" /> Add
         </Button>
@@ -78,21 +79,21 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
       
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full animate-fade-in">
-        <TabsList className="grid w-full grid-cols-3 mb-lg">
+        <TabsList className="grid w-full grid-cols-3 mb-lg backdrop-blur-sm bg-background/50 border-primary/20">
           <TabsTrigger value="all" className="flex gap-2 items-center">
-            All <Badge variant="secondary">{todos.length}</Badge>
+            All <Badge variant="secondary" className="backdrop-blur-sm bg-background/60">{todos.length}</Badge>
           </TabsTrigger>
           <TabsTrigger value="active" className="flex gap-2 items-center">
-            Active <Badge variant="secondary">{incompleteTodos.length}</Badge>
+            Active <Badge variant="secondary" className="backdrop-blur-sm bg-background/60">{incompleteTodos.length}</Badge>
           </TabsTrigger>
           <TabsTrigger value="completed" className="flex gap-2 items-center">
-            Completed <Badge variant="secondary">{completedTodos.length}</Badge>
+            Completed <Badge variant="secondary" className="backdrop-blur-sm bg-background/60">{completedTodos.length}</Badge>
           </TabsTrigger>
         </TabsList>
         
         <TabsContent value="all" className="mt-4 animate-scale-in">
           {todos.length === 0 ? (
-            <div className="text-center text-muted-foreground py-10 border-2 border-dashed rounded-lg flex flex-col items-center gap-4">
+            <div className="text-center text-muted-foreground py-10 border-2 border-dashed border-primary/20 rounded-lg flex flex-col items-center gap-4 backdrop-blur-sm bg-background/30">
               <ListPlus size={48} className="text-muted-foreground/50" />
               <div>
                 <p className="font-medium">No tasks yet</p>
@@ -110,7 +111,7 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
         
         <TabsContent value="active" className="mt-4 animate-scale-in">
           {incompleteTodos.length === 0 ? (
-            <div className="text-center text-muted-foreground py-10 border-2 border-dashed rounded-lg flex flex-col items-center gap-4">
+            <div className="text-center text-muted-foreground py-10 border-2 border-dashed border-primary/20 rounded-lg flex flex-col items-center gap-4 backdrop-blur-sm bg-background/30">
               <Check size={48} className="text-success/50" />
               <div>
                 <p className="font-medium">No active tasks</p>
@@ -128,7 +129,7 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
         
         <TabsContent value="completed" className="mt-4 animate-scale-in">
           {completedTodos.length === 0 ? (
-            <div className="text-center text-muted-foreground py-10 border-2 border-dashed rounded-lg flex flex-col items-center gap-4">
+            <div className="text-center text-muted-foreground py-10 border-2 border-dashed border-primary/20 rounded-lg flex flex-col items-center gap-4 backdrop-blur-sm bg-background/30">
               <ListPlus size={48} className="text-muted-foreground/50" />
               <div>
                 <p className="font-medium">No completed tasks yet</p>
@@ -150,7 +151,7 @@ export function TodoListView({ listId, title, color }: TodoListProps) {
           <Button 
             variant="outline" 
             onClick={() => setActiveTab("completed")}
-            className="text-sm transition-all duration-200"
+            className="text-sm transition-all duration-200 backdrop-blur-sm bg-background/50 border-primary/20 hover:bg-background/70"
           >
             View {completedTodos.length} completed {completedTodos.length === 1 ? 'task' : 'tasks'}
           </Button>
