@@ -59,32 +59,35 @@ export default function RegisterPage() {
     }
   };
   
+  
   return (
-    <div className="relative flex flex-col min-h-screen bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 relative">
       <InteractiveBackground />
-      <div className="relative z-10 flex justify-end p-4">
-        <ThemeToggle />
-      </div>
-      <div className="relative z-10 flex items-center justify-center flex-1">
-        <Card className="w-full max-w-md animate-slide-up backdrop-blur-sm bg-black/40 border-white/30 shadow-2xl">
+      
+      
+      <div className="flex flex-col w-full max-w-md relative z-10">
+        <div className="relative z-10 flex justify-end p-4">
+         {/*<ThemeToggle />*/ /*use only if needed, the div is not placed in the right place (top right corner of the page) */} 
+        </div>
+        
+        <Card className="w-full animate-slide-up backdrop-blur-sm bg-card/20 border-primary/10">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold text-white drop-shadow-lg">Create an account</CardTitle>
+            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-white font-medium drop-shadow">Name</Label>
+                <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white font-medium drop-shadow">Email</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -92,44 +95,40 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-white font-medium drop-shadow">Password</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="passwordConfirmation" className="text-white font-medium drop-shadow">Confirm Password</Label>
+                <Label htmlFor="passwordConfirmation">Confirm Password</Label>
                 <Input
                   id="passwordConfirmation"
                   type="password"
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
                   required
-                  className="bg-white/20 border-white/40 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/60"
                 />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full bg-white/25 hover:bg-white/35 text-white border-white/40 backdrop-blur-sm font-medium shadow-lg" 
+                className="w-full" 
                 disabled={isSubmitting}
-                variant="outline"
               >
                 {isSubmitting ? "Creating account..." : "Sign up"}
               </Button>
-              <div className="text-center text-sm text-white/90 drop-shadow">
+              <div className="text-center text-sm">
                 Already have an account?{" "}
-                <Link to="/login" className="text-white hover:underline font-medium">
+                <Link to="/login" className="text-primary hover:underline">
                   Log in
                 </Link>
               </div>

@@ -77,16 +77,24 @@ export default function LoginPage() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
+               <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  />  
+              <div className="text-right">
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-white/90 hover:text-white hover:underline drop-shadow"
+                     >
+                     Forgot password?
+                   </Link>
+              </div>
             </div>
             
             <Button 
