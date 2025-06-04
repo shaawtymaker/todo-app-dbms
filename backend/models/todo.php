@@ -126,3 +126,4 @@ class Todo {
         return $stmt->execute();
     }
 }
+$todo = new todo();

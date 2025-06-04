@@ -69,3 +69,4 @@ class User {
         return false;
     }
 }
+$user = new user();
