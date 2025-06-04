@@ -42,7 +42,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Welcome card */}
-      <Card className="animate-scale-in backdrop-blur-lg bg-card/90 border-primary/20" style={{animationDelay: '0.1s'}}>
+      <Card className="animate-scale-in backdrop-blur-sm bg-card/20 border-primary/10" style={{animationDelay: '0.1s'}}>
         <CardHeader>
           <CardTitle>Welcome back, {user?.name || 'User'}!</CardTitle>
           <CardDescription>Here's an overview of your tasks</CardDescription>
@@ -70,7 +70,7 @@ export default function DashboardPage() {
 
       {/* Progress card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="animate-scale-in backdrop-blur-lg bg-card/90 border-primary/20" style={{animationDelay: '0.2s'}}>
+        <Card className="animate-scale-in backdrop-blur-sm bg-card/20 border-primary/10" style={{animationDelay: '0.2s'}}>
           <CardHeader>
             <CardTitle>Completion Progress</CardTitle>
             <CardDescription>Your task completion rate</CardDescription>
@@ -101,7 +101,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="animate-scale-in backdrop-blur-lg bg-card/90 border-primary/20" style={{animationDelay: '0.3s'}}>
+        <Card className="animate-scale-in backdrop-blur-sm bg-card/20 border-primary/10" style={{animationDelay: '0.3s'}}>
           <CardHeader>
             <CardTitle>Task Distribution</CardTitle>
             <CardDescription>Your tasks by status</CardDescription>
@@ -156,7 +156,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Lists Overview */}
-      <Card className="animate-scale-in backdrop-blur-lg bg-card/90 border-primary/20" style={{animationDelay: '0.4s'}}>
+      <Card className="animate-scale-in backdrop-blur-sm bg-card/20 border-primary/10" style={{animationDelay: '0.4s'}}>
         <CardHeader>
           <CardTitle>Lists Overview</CardTitle>
           <CardDescription>Status of tasks in each list</CardDescription>
@@ -177,7 +177,7 @@ export default function DashboardPage() {
                   : 0;
 
                 return (
-                  <div key={list.id} className="border rounded-lg p-4 backdrop-blur-sm bg-background/50 border-primary/20">
+                  <div key={list.id} className="border rounded-lg p-4 backdrop-blur-sm bg-background/30 border-primary/20">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full" style={{ backgroundColor: list.color }}></span>

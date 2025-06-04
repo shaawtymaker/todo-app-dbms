@@ -60,7 +60,7 @@ export default function AppLayout() {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed top-4 left-4 z-50 touch-target backdrop-blur-sm bg-background/80"
+          className="fixed top-4 left-4 z-50 touch-target backdrop-blur-sm bg-background/50"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
@@ -72,7 +72,7 @@ export default function AppLayout() {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         ${isMobile ? 'fixed z-40' : 'relative'}
         transition-transform duration-300 ease-in-out
-        w-64 h-screen bg-card/95 backdrop-blur-lg border-r
+        w-64 h-screen bg-card/30 backdrop-blur-md border-r border-primary/10
       `}>
         <Sidebar onNavItemClick={() => isMobile && setSidebarOpen(false)} />
       </div>
@@ -88,13 +88,13 @@ export default function AppLayout() {
           <div className="flex justify-end mb-6">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full w-10 h-10 backdrop-blur-sm bg-background/80">
+                <Button variant="ghost" size="icon" className="rounded-full w-10 h-10 backdrop-blur-sm bg-background/50">
                   <Avatar>
                     <AvatarFallback>{getUserInitials()}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 backdrop-blur-lg bg-card/95">
+              <DropdownMenuContent align="end" className="w-56 backdrop-blur-lg bg-card/30">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/settings')}>
